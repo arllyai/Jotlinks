@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>JotLinks.com | Personal Resume</title>
+    <meta
+      name="description"
+      content="Modern, responsive personal resume website for recruiters and clients."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <nav class="navbar">
+        <a class="logo" href="#home" aria-label="JotLinks.com homepage">
+          JotLinks<span class="logo-dot">.com</span>
+        </a>
+        <button
+          class="menu-toggle"
+          type="button"
+          aria-label="Toggle navigation menu"
+          aria-expanded="false"
+          aria-controls="primary-navigation"
+        >
+          <span class="menu-bar"></span>
+          <span class="menu-bar"></span>
+          <span class="menu-bar"></span>
+        </button>
+        <ul class="nav-links" id="primary-navigation">
+          <li><a href="#about">About</a></li>
+          <li><a href="#skills">Skills</a></li>
+          <li><a href="#experience">Experience</a></li>
+          <li><a href="#projects">Projects</a></li>
+          <li><a href="#resume">Resume</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero" id="home">
+        <div class="hero-content">
+          <p class="eyebrow">Hello, I'm</p>
+          <h1>Alex Morgan</h1>
+          <h2>Senior Product Designer</h2>
+          <p class="hero-summary">
+            I design intuitive, scalable digital experiences that help teams
+            ship faster and customers feel supported. Passionate about human-
+            centered design, data-driven decisions, and clean execution.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#resume">View Resume</a>
+            <a class="btn btn-secondary" href="#contact">Contact Me</a>
+          </div>
+        </div>
+        <div class="hero-card">
+          <p class="card-title">Quick Snapshot</p>
+          <ul class="stat-list">
+            <li>
+              <span class="stat-value">8+ Years</span>
+              <span class="stat-label">Experience</span>
+            </li>
+            <li>
+              <span class="stat-value">32 Projects</span>
+              <span class="stat-label">Delivered</span>
+            </li>
+            <li>
+              <span class="stat-value">4 Teams</span>
+              <span class="stat-label">Led</span>
+            </li>
+          </ul>
+        </div>
+      </section>
+
+      <section class="section" id="about">
+        <div class="section-header">
+          <p class="eyebrow">About</p>
+          <h3>Professional Bio</h3>
+        </div>
+        <div class="about-grid">
+          <p>
+            I’m a multidisciplinary designer focused on creating modern web and
+            mobile products. I partner with engineering and stakeholders to
+            define product direction, validate hypotheses, and ship delightful
+            experiences. I value clarity, empathy, and measurable outcomes.
+          </p>
+          <div class="about-highlights">
+            <h4>Key Strengths</h4>
+            <ul>
+              <li>Product strategy &amp; user research</li>
+              <li>Design systems &amp; prototyping</li>
+              <li>Cross-functional collaboration</li>
+              <li>Data-informed decision making</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="skills">
+        <div class="section-header">
+          <p class="eyebrow">Skills</p>
+          <h3>Core Competencies</h3>
+        </div>
+        <div class="skills-grid">
+          <article class="skill-card">
+            <h4>Technical</h4>
+            <div class="skill">
+              <div class="skill-label">
+                <span>HTML, CSS, JavaScript</span>
+                <span>90%</span>
+              </div>
+              <div class="skill-bar">
+                <span class="skill-meter" data-level="90%"></span>
+              </div>
+            </div>
+            <div class="skill">
+              <div class="skill-label">
+                <span>Design Systems</span>
+                <span>88%</span>
+              </div>
+              <div class="skill-bar">
+                <span class="skill-meter" data-level="88%"></span>
+              </div>
+            </div>
+            <div class="skill">
+              <div class="skill-label">
+                <span>Accessibility</span>
+                <span>85%</span>
+              </div>
+              <div class="skill-bar">
+                <span class="skill-meter" data-level="85%"></span>
+              </div>
+            </div>
+          </article>
+
+          <article class="skill-card">
+            <h4>Tools</h4>
+            <div class="skill">
+              <div class="skill-label">
+                <span>Figma &amp; FigJam</span>
+                <span>95%</span>
+              </div>
+              <div class="skill-bar">
+                <span class="skill-meter" data-level="95%"></span>
+              </div>
+            </div>
+            <div class="skill">
+              <div class="skill-label">
+                <span>Notion &amp; Jira</span>
+                <span>90%</span>
+              </div>
+              <div class="skill-bar">
+                <span class="skill-meter" data-level="90%"></span>
+              </div>
+            </div>
+            <div class="skill">
+              <div class="skill-label">
+                <span>Adobe Creative Suite</span>
+                <span>80%</span>
+              </div>
+              <div class="skill-bar">
+                <span class="skill-meter" data-level="80%"></span>
+              </div>
+            </div>
+          </article>
+
+          <article class="skill-card">
+            <h4>Soft Skills</h4>
+            <div class="skill">
+              <div class="skill-label">
+                <span>Leadership &amp; Mentoring</span>
+                <span>92%</span>
+              </div>
+              <div class="skill-bar">
+                <span class="skill-meter" data-level="92%"></span>
+              </div>
+            </div>
+            <div class="skill">
+              <div class="skill-label">
+                <span>Communication</span>
+                <span>94%</span>
+              </div>
+              <div class="skill-bar">
+                <span class="skill-meter" data-level="94%"></span>
+              </div>
+            </div>
+            <div class="skill">
+              <div class="skill-label">
+                <span>Strategic Thinking</span>
+                <span>89%</span>
+              </div>
+              <div class="skill-bar">
+                <span class="skill-meter" data-level="89%"></span>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="experience">
+        <div class="section-header">
+          <p class="eyebrow">Experience</p>
+          <h3>Professional Timeline</h3>
+        </div>
+        <ol class="timeline">
+          <li class="timeline-item">
+            <div class="timeline-card">
+              <div>
+                <h4>Lead Product Designer</h4>
+                <p class="muted">Nova Digital · 2022 — Present</p>
+              </div>
+              <ul>
+                <li>Directed design strategy for a 12-person product team.</li>
+                <li>Reduced onboarding time by 38% with new UX flows.</li>
+                <li>Implemented a design system used across 5 products.</li>
+              </ul>
+            </div>
+          </li>
+          <li class="timeline-item">
+            <div class="timeline-card">
+              <div>
+                <h4>Senior UX Designer</h4>
+                <p class="muted">BrightLabs · 2019 — 2022</p>
+              </div>
+              <ul>
+                <li>Led research and testing cycles for mobile releases.</li>
+                <li>Improved conversion rates by 22% through UX audits.</li>
+                <li>Partnered with engineers to ship features bi-weekly.</li>
+              </ul>
+            </div>
+          </li>
+          <li class="timeline-item">
+            <div class="timeline-card">
+              <div>
+                <h4>Product Designer</h4>
+                <p class="muted">Studio Grey · 2016 — 2019</p>
+              </div>
+              <ul>
+                <li>Designed responsive experiences for SaaS clients.</li>
+                <li>Created wireframes, prototypes, and visual systems.</li>
+                <li>Collaborated with PMs on roadmap planning.</li>
+              </ul>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="section" id="projects">
+        <div class="section-header">
+          <p class="eyebrow">Projects</p>
+          <h3>Selected Work</h3>
+        </div>
+        <div class="projects-grid">
+          <article class="project-card">
+            <h4>Atlas Analytics Dashboard</h4>
+            <p>
+              Redesigned an analytics platform to improve clarity and
+              decision-making with modular widgets.
+            </p>
+            <a href="#" aria-label="View Atlas Analytics Dashboard project">
+              View project →
+            </a>
+          </article>
+          <article class="project-card">
+            <h4>Pulse Mobile Banking</h4>
+            <p>
+              Built a new mobile banking experience with secure onboarding and
+              streamlined transfers.
+            </p>
+            <a href="#" aria-label="View Pulse Mobile Banking project">
+              View project →
+            </a>
+          </article>
+          <article class="project-card">
+            <h4>Studio Brand System</h4>
+            <p>
+              Developed a cohesive brand system and component library for a
+              global creative agency.
+            </p>
+            <a href="#" aria-label="View Studio Brand System project">
+              View project →
+            </a>
+          </article>
+          <article class="project-card">
+            <h4>Helio E-Commerce</h4>
+            <p>
+              Crafted a conversion-focused storefront with improved navigation
+              and product discovery.
+            </p>
+            <a href="#" aria-label="View Helio E-Commerce project">
+              View project →
+            </a>
+          </article>
+        </div>
+      </section>
+
+      <section class="section resume-section" id="resume">
+        <div class="section-header">
+          <p class="eyebrow">Resume</p>
+          <h3>Download My Resume</h3>
+        </div>
+        <div class="resume-card">
+          <p>
+            Prefer a PDF? Download the full resume and share it with your team.
+            Replace the <strong>resume.pdf</strong> file with your latest
+            version.
+          </p>
+          <a class="btn btn-primary" href="resume.pdf" download>
+            Download Resume PDF
+          </a>
+        </div>
+      </section>
+
+      <section class="section contact-section" id="contact">
+        <div class="section-header">
+          <p class="eyebrow">Contact</p>
+          <h3>Let’s Work Together</h3>
+        </div>
+        <div class="contact-grid">
+          <form class="contact-form" action="#" method="post">
+            <label for="name">Name</label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Your name"
+              required
+            />
+
+            <label for="email">Email</label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              placeholder="you@email.com"
+              required
+            />
+
+            <label for="message">Message</label>
+            <textarea
+              id="message"
+              name="message"
+              rows="5"
+              placeholder="Tell me about your project..."
+              required
+            ></textarea>
+
+            <button class="btn btn-primary" type="submit">
+              Send Message
+            </button>
+          </form>
+          <div class="contact-details">
+            <p>
+              I’m open to full-time roles, freelance work, and speaking
+              opportunities. Reach out and I’ll reply within 48 hours.
+            </p>
+            <div class="social-links">
+              <a href="#" aria-label="LinkedIn profile">LinkedIn</a>
+              <a href="#" aria-label="GitHub profile">GitHub</a>
+              <a href="#" aria-label="Portfolio profile">Portfolio</a>
+              <a href="mailto:hello@jotlinks.com">hello@jotlinks.com</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        © <span id="year"></span> JotLinks.com · Crafted with care for modern
+        teams.
+      </p>
+    </footer>
+  </body>
+</html>
