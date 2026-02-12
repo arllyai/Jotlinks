@@ -395,6 +395,15 @@ ol {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
+.auth-page {
+  min-height: calc(100vh - 140px);
+}
+
+.auth-intro {
+  margin-top: 8px;
+  max-width: 520px;
+}
+
 .auth-card {
   background: var(--surface);
   border-radius: var(--radius);
@@ -454,6 +463,11 @@ ol {
 .auth-message,
 .auth-hint {
   font-size: 0.9rem;
+}
+
+.auth-switch a {
+  color: var(--accent);
+  font-weight: 600;
 }
 
 .auth-message {

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Login | JotLinks.com</title>
+    <meta
+      name="description"
+      content="Secure login for JotLinks.com with email, Google, or Microsoft."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script
+      src="https://www.gstatic.com/firebasejs/12.9.0/firebase-app-compat.js"
+      defer
+    ></script>
+    <script
+      src="https://www.gstatic.com/firebasejs/12.9.0/firebase-auth-compat.js"
+      defer
+    ></script>
+    <script
+      src="https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore-compat.js"
+      defer
+    ></script>
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <nav class="navbar">
+        <a class="logo" href="index.html#home" aria-label="JotLinks.com homepage">
+          JotLinks<span class="logo-dot">.com</span>
+        </a>
+        <button
+          class="menu-toggle"
+          type="button"
+          aria-label="Toggle navigation menu"
+          aria-expanded="false"
+          aria-controls="primary-navigation"
+        >
+          <span class="menu-bar"></span>
+          <span class="menu-bar"></span>
+          <span class="menu-bar"></span>
+        </button>
+        <ul class="nav-links" id="primary-navigation">
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#skills">Skills</a></li>
+          <li><a href="index.html#experience">Experience</a></li>
+          <li><a href="index.html#projects">Projects</a></li>
+          <li><a href="index.html#resume">Resume</a></li>
+          <li><a href="index.html#contact">Contact</a></li>
+          <li><a href="register.html">Register</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main" class="auth-page">
+      <section class="section auth-section">
+        <div class="section-header">
+          <p class="eyebrow">Account</p>
+          <h3>Welcome Back</h3>
+          <p class="muted auth-intro">
+            Sign in to manage your profile and keep your information secure.
+          </p>
+        </div>
+        <div class="auth-grid">
+          <div class="auth-card">
+            <h4>Sign in with email</h4>
+            <form class="auth-form" id="auth-form">
+              <label for="auth-email">Email</label>
+              <input
+                type="email"
+                id="auth-email"
+                name="auth-email"
+                placeholder="you@email.com"
+                autocomplete="username"
+                required
+              />
+
+              <label for="auth-password">Password</label>
+              <input
+                type="password"
+                id="auth-password"
+                name="auth-password"
+                placeholder="Enter your password"
+                autocomplete="current-password"
+                required
+              />
+
+              <button class="btn btn-primary" type="button" id="email-login">
+                Email Sign In
+              </button>
+            </form>
+            <div class="divider">
+              <span>or continue with</span>
+            </div>
+            <div class="auth-providers">
+              <button class="btn btn-secondary" type="button" id="google-login">
+                Google
+              </button>
+              <button
+                class="btn btn-secondary"
+                type="button"
+                id="microsoft-login"
+              >
+                Microsoft
+              </button>
+            </div>
+            <p class="auth-message muted" id="auth-message">
+              Add your Firebase config in script.js to enable login.
+            </p>
+            <p class="auth-switch muted">
+              New here? <a href="register.html">Create an account</a>
+            </p>
+          </div>
+
+          <div class="auth-card" id="profile-card">
+            <h4>Profile and secure data</h4>
+            <p class="muted">Save your details to your private user record.</p>
+            <div class="auth-status" id="auth-status">Not signed in</div>
+            <form class="auth-form" id="profile-form">
+              <label for="profile-name">Full name</label>
+              <input
+                type="text"
+                id="profile-name"
+                name="profile-name"
+                placeholder="Your name"
+                autocomplete="name"
+              />
+
+              <label for="profile-role">Role or title</label>
+              <input
+                type="text"
+                id="profile-role"
+                name="profile-role"
+                placeholder="Product Designer"
+                autocomplete="organization-title"
+              />
+
+              <label for="profile-location">Location</label>
+              <input
+                type="text"
+                id="profile-location"
+                name="profile-location"
+                placeholder="City, Country"
+                autocomplete="address-level2"
+              />
+
+              <button class="btn btn-primary" type="submit">
+                Save Profile
+              </button>
+            </form>
+            <button class="btn btn-secondary" type="button" id="signout">
+              Sign Out
+            </button>
+            <p class="auth-hint muted">
+              Protect data with Firebase Security Rules so users can access only
+              their own document.
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        © <span id="year"></span> JotLinks.com · Crafted with care for modern
+        teams.
+      </p>
+    </footer>
+  </body>
+</html>
