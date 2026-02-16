@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { isSameOrigin } from "@/lib/request";
@@ -98,7 +99,7 @@ export async function PATCH(request: Request, { params }: Params) {
       title: parsed.data.title,
       template: parsed.data.template,
       isPublic: parsed.data.isPublic,
-      data: parsed.data.data,
+      data: parsed.data.data as unknown as Prisma.InputJsonValue,
     },
   });
 

@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { getServerSession } from "next-auth";
 
-import { auth } from "@/auth";
 import { SignOutButton } from "@/components/auth/sign-out-button";
+import { authOptions } from "@/lib/auth-options";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 export async function Navbar() {
-  const session = await auth();
+  const session = await getServerSession(authOptions);
 
   return (
     <header className="sticky top-0 z-40 border-b border-zinc-200/70 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80">

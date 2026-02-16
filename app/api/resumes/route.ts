@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 
 import { createEmptyResumeData } from "@/lib/default-resume";
 import { prisma } from "@/lib/prisma";
@@ -76,15 +77,17 @@ export async function POST(request: Request) {
     );
   }
 
-  const slug = await generateUniqueSlug(parsed.data.title);
+  const title = parsed.data.title ?? "My Resume";
+  const template = parsed.data.template ?? "classic";
+  const slug = await generateUniqueSlug(title);
 
   const resume = await prisma.resume.create({
     data: {
       userId,
-      title: parsed.data.title,
-      template: parsed.data.template ?? "classic",
+      title,
+      template,
       slug,
-      data: createEmptyResumeData(),
+      data: createEmptyResumeData() as unknown as Prisma.InputJsonValue,
     },
     select: {
       id: true,

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
 import { isSameOrigin } from "@/lib/request";
@@ -58,7 +59,7 @@ export async function POST(request: Request, { params }: Params) {
       userId,
       title: duplicateTitle,
       template: existing.template,
-      data: existing.data,
+      data: (existing.data ?? {}) as Prisma.InputJsonValue,
       slug,
       isPublic: false,
     },

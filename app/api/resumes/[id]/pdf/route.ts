@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Buffer } from "node:buffer";
 
 import { buildResumePdf } from "@/lib/pdf";
 import { prisma } from "@/lib/prisma";
@@ -51,7 +52,7 @@ export async function GET(_request: Request, { params }: Params) {
     data: dataValidation.data,
   });
 
-  return new NextResponse(bytes, {
+  return new NextResponse(Buffer.from(bytes), {
     status: 200,
     headers: {
       "Content-Type": "application/pdf",

@@ -1,11 +1,12 @@
 import { redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
 
-import { auth } from "@/auth";
 import { ResumeList } from "@/components/dashboard/resume-list";
+import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 
 export default async function DashboardPage() {
-  const session = await auth();
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     redirect("/login");

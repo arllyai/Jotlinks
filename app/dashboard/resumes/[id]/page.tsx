@@ -1,7 +1,8 @@
 import { notFound, redirect } from "next/navigation";
+import { getServerSession } from "next-auth";
 
-import { auth } from "@/auth";
 import { ResumeBuilder } from "@/components/builder/resume-builder";
+import { authOptions } from "@/lib/auth-options";
 import { prisma } from "@/lib/prisma";
 import { resumeDataSchema, resumeTemplateSchema } from "@/lib/validation";
 
@@ -10,7 +11,7 @@ export default async function ResumeBuilderPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
-  const session = await auth();
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     redirect("/login");

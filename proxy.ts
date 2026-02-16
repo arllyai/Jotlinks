@@ -1,9 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
+import { getToken } from "next-auth/jwt";
 
-import { auth } from "@/auth";
+export async function proxy(request: NextRequest) {
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
+  });
 
-export default auth((request) => {
-  const isLoggedIn = Boolean(request.auth);
+  const isLoggedIn = Boolean(token);
   const { pathname } = request.nextUrl;
 
   if (!isLoggedIn && pathname.startsWith("/dashboard")) {
@@ -15,7 +19,7 @@ export default auth((request) => {
   }
 
   return NextResponse.next();
-});
+}
 
 export const config = {
   matcher: ["/dashboard/:path*", "/login", "/signup"],
