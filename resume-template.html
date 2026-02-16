@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <title>Resume Template | JotLinks.com</title>
+    <meta
+      name="description"
+      content="Build a modern resume template with editable form sections."
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+
+    <header class="site-header">
+      <nav class="navbar">
+        <a class="logo" href="index.html#home" aria-label="JotLinks.com homepage">
+          JotLinks<span class="logo-dot">.com</span>
+        </a>
+        <button
+          class="menu-toggle"
+          type="button"
+          aria-label="Toggle navigation menu"
+          aria-expanded="false"
+          aria-controls="primary-navigation"
+        >
+          <span class="menu-bar"></span>
+          <span class="menu-bar"></span>
+          <span class="menu-bar"></span>
+        </button>
+        <ul class="nav-links" id="primary-navigation">
+          <li><a href="index.html#about">About</a></li>
+          <li><a href="index.html#skills">Skills</a></li>
+          <li><a href="index.html#experience">Experience</a></li>
+          <li><a href="index.html#projects">Projects</a></li>
+          <li><a href="index.html#resume">Resume</a></li>
+          <li><a href="login.html">Login</a></li>
+          <li><a href="register.html">Register</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main id="main" class="resume-builder-page">
+      <section class="section resume-template-section">
+        <div class="section-header">
+          <p class="eyebrow">Resume Template</p>
+          <h3>Build a Clean, Modern Resume</h3>
+          <p class="muted auth-intro">
+            Fill in the form and add new sections for experience, education, or
+            projects. The preview updates in real time.
+          </p>
+        </div>
+
+        <div class="builder-grid">
+          <form class="builder-form" id="resume-builder">
+            <div class="form-section">
+              <h4>Basics</h4>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="full-name">Full name</label>
+                  <input
+                    type="text"
+                    id="full-name"
+                    placeholder="Your name"
+                    data-preview-target="preview-name"
+                  />
+                </div>
+                <div class="form-field">
+                  <label for="headline">Professional title</label>
+                  <input
+                    type="text"
+                    id="headline"
+                    placeholder="Product Designer"
+                    data-preview-target="preview-title"
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="email">Email</label>
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="you@email.com"
+                    data-preview-target="preview-email"
+                  />
+                </div>
+                <div class="form-field">
+                  <label for="phone">Phone</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    placeholder="(555) 123-4567"
+                    data-preview-target="preview-phone"
+                  />
+                </div>
+              </div>
+              <div class="form-row">
+                <div class="form-field">
+                  <label for="location">Location</label>
+                  <input
+                    type="text"
+                    id="location"
+                    placeholder="City, Country"
+                    data-preview-target="preview-location"
+                  />
+                </div>
+                <div class="form-field">
+                  <label for="website">Portfolio or LinkedIn</label>
+                  <input
+                    type="text"
+                    id="website"
+                    placeholder="linkedin.com/in/yourname"
+                    data-preview-target="preview-website"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4>Summary</h4>
+              <div class="form-field">
+                <label for="summary">Short professional summary</label>
+                <textarea
+                  id="summary"
+                  rows="4"
+                  placeholder="Write a concise summary about your experience and goals."
+                  data-preview-target="preview-summary"
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-header-inline">
+                <h4>Experience</h4>
+                <button
+                  class="btn btn-secondary btn-small"
+                  type="button"
+                  id="add-experience"
+                >
+                  Add Experience
+                </button>
+              </div>
+              <div class="repeat-list" id="experience-list">
+                <div class="repeat-item">
+                  <div class="form-row">
+                    <div class="form-field">
+                      <label>Role</label>
+                      <input type="text" data-field="role" placeholder="Role" />
+                    </div>
+                    <div class="form-field">
+                      <label>Company</label>
+                      <input
+                        type="text"
+                        data-field="company"
+                        placeholder="Company"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-field">
+                      <label>Dates</label>
+                      <input
+                        type="text"
+                        data-field="dates"
+                        placeholder="2022 - Present"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-field">
+                    <label>Achievements</label>
+                    <textarea
+                      rows="3"
+                      data-field="achievements"
+                      placeholder="Achievement one&#10;Achievement two"
+                    ></textarea>
+                  </div>
+                  <button
+                    class="btn btn-tertiary btn-small remove-item"
+                    type="button"
+                    data-remove="experience"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-header-inline">
+                <h4>Education</h4>
+                <button
+                  class="btn btn-secondary btn-small"
+                  type="button"
+                  id="add-education"
+                >
+                  Add Education
+                </button>
+              </div>
+              <div class="repeat-list" id="education-list">
+                <div class="repeat-item">
+                  <div class="form-row">
+                    <div class="form-field">
+                      <label>Degree</label>
+                      <input
+                        type="text"
+                        data-field="degree"
+                        placeholder="B.A. in Design"
+                      />
+                    </div>
+                    <div class="form-field">
+                      <label>School</label>
+                      <input
+                        type="text"
+                        data-field="school"
+                        placeholder="University Name"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-row">
+                    <div class="form-field">
+                      <label>Dates</label>
+                      <input
+                        type="text"
+                        data-field="dates"
+                        placeholder="2014 - 2018"
+                      />
+                    </div>
+                    <div class="form-field">
+                      <label>Details</label>
+                      <input
+                        type="text"
+                        data-field="details"
+                        placeholder="Honors, GPA, or focus area"
+                      />
+                    </div>
+                  </div>
+                  <button
+                    class="btn btn-tertiary btn-small remove-item"
+                    type="button"
+                    data-remove="education"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <div class="section-header-inline">
+                <h4>Projects</h4>
+                <button
+                  class="btn btn-secondary btn-small"
+                  type="button"
+                  id="add-project"
+                >
+                  Add Project
+                </button>
+              </div>
+              <div class="repeat-list" id="project-list">
+                <div class="repeat-item">
+                  <div class="form-row">
+                    <div class="form-field">
+                      <label>Project name</label>
+                      <input
+                        type="text"
+                        data-field="project"
+                        placeholder="Project name"
+                      />
+                    </div>
+                    <div class="form-field">
+                      <label>Link</label>
+                      <input
+                        type="text"
+                        data-field="link"
+                        placeholder="https://project.com"
+                      />
+                    </div>
+                  </div>
+                  <div class="form-field">
+                    <label>Short description</label>
+                    <textarea
+                      rows="2"
+                      data-field="summary"
+                      placeholder="What did you build or deliver?"
+                    ></textarea>
+                  </div>
+                  <button
+                    class="btn btn-tertiary btn-small remove-item"
+                    type="button"
+                    data-remove="project"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h4>Skills</h4>
+              <div class="form-field">
+                <label for="skills-input">Skills (comma separated)</label>
+                <input
+                  type="text"
+                  id="skills-input"
+                  placeholder="UX Research, UI Design, Prototyping"
+                />
+              </div>
+            </div>
+          </form>
+
+          <aside class="resume-preview" id="resume-preview">
+            <div class="preview-header">
+              <div>
+                <h2 id="preview-name" data-placeholder="Your Name">
+                  Your Name
+                </h2>
+                <p id="preview-title" data-placeholder="Professional Title">
+                  Professional Title
+                </p>
+              </div>
+              <div class="preview-contact">
+                <span id="preview-email" data-placeholder="you@email.com">
+                  you@email.com
+                </span>
+                <span id="preview-phone" data-placeholder="(555) 123-4567">
+                  (555) 123-4567
+                </span>
+                <span id="preview-location" data-placeholder="City, Country">
+                  City, Country
+                </span>
+                <span
+                  id="preview-website"
+                  data-placeholder="linkedin.com/in/yourname"
+                >
+                  linkedin.com/in/yourname
+                </span>
+              </div>
+            </div>
+
+            <div class="preview-section">
+              <h3>Summary</h3>
+              <p
+                id="preview-summary"
+                data-placeholder="Write a short professional summary that highlights your impact."
+              >
+                Write a short professional summary that highlights your impact.
+              </p>
+            </div>
+
+            <div class="preview-section">
+              <h3>Skills</h3>
+              <div class="preview-skills" id="preview-skills"></div>
+            </div>
+
+            <div class="preview-section">
+              <h3>Experience</h3>
+              <div class="preview-list" id="preview-experience"></div>
+            </div>
+
+            <div class="preview-section">
+              <h3>Education</h3>
+              <div class="preview-list" id="preview-education"></div>
+            </div>
+
+            <div class="preview-section">
+              <h3>Projects</h3>
+              <div class="preview-list" id="preview-projects"></div>
+            </div>
+          </aside>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        © <span id="year"></span> JotLinks.com · Crafted with care for modern
+        teams.
+      </p>
+    </footer>
+
+    <template id="experience-template">
+      <div class="repeat-item">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Role</label>
+            <input type="text" data-field="role" placeholder="Role" />
+          </div>
+          <div class="form-field">
+            <label>Company</label>
+            <input type="text" data-field="company" placeholder="Company" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Dates</label>
+            <input type="text" data-field="dates" placeholder="2022 - Present" />
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Achievements</label>
+          <textarea
+            rows="3"
+            data-field="achievements"
+            placeholder="Achievement one&#10;Achievement two"
+          ></textarea>
+        </div>
+        <button
+          class="btn btn-tertiary btn-small remove-item"
+          type="button"
+          data-remove="experience"
+        >
+          Remove
+        </button>
+      </div>
+    </template>
+
+    <template id="education-template">
+      <div class="repeat-item">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Degree</label>
+            <input
+              type="text"
+              data-field="degree"
+              placeholder="B.A. in Design"
+            />
+          </div>
+          <div class="form-field">
+            <label>School</label>
+            <input
+              type="text"
+              data-field="school"
+              placeholder="University Name"
+            />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-field">
+            <label>Dates</label>
+            <input type="text" data-field="dates" placeholder="2014 - 2018" />
+          </div>
+          <div class="form-field">
+            <label>Details</label>
+            <input
+              type="text"
+              data-field="details"
+              placeholder="Honors, GPA, or focus area"
+            />
+          </div>
+        </div>
+        <button
+          class="btn btn-tertiary btn-small remove-item"
+          type="button"
+          data-remove="education"
+        >
+          Remove
+        </button>
+      </div>
+    </template>
+
+    <template id="project-template">
+      <div class="repeat-item">
+        <div class="form-row">
+          <div class="form-field">
+            <label>Project name</label>
+            <input type="text" data-field="project" placeholder="Project name" />
+          </div>
+          <div class="form-field">
+            <label>Link</label>
+            <input
+              type="text"
+              data-field="link"
+              placeholder="https://project.com"
+            />
+          </div>
+        </div>
+        <div class="form-field">
+          <label>Short description</label>
+          <textarea
+            rows="2"
+            data-field="summary"
+            placeholder="What did you build or deliver?"
+          ></textarea>
+        </div>
+        <button
+          class="btn btn-tertiary btn-small remove-item"
+          type="button"
+          data-remove="project"
+        >
+          Remove
+        </button>
+      </div>
+    </template>
+  </body>
+</html>

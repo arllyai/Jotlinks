@@ -294,3 +294,321 @@ if (!firebaseAvailable) {
     }
   });
 }
+
+const resumeBuilder = document.getElementById("resume-builder");
+if (resumeBuilder) {
+  const previewInputs = resumeBuilder.querySelectorAll("[data-preview-target]");
+  const skillsInput = document.getElementById("skills-input");
+  const previewSkills = document.getElementById("preview-skills");
+
+  const experienceList = document.getElementById("experience-list");
+  const educationList = document.getElementById("education-list");
+  const projectList = document.getElementById("project-list");
+
+  const previewExperience = document.getElementById("preview-experience");
+  const previewEducation = document.getElementById("preview-education");
+  const previewProjects = document.getElementById("preview-projects");
+
+  const experienceTemplate = document.getElementById("experience-template");
+  const educationTemplate = document.getElementById("education-template");
+  const projectTemplate = document.getElementById("project-template");
+
+  const addExperienceButton = document.getElementById("add-experience");
+  const addEducationButton = document.getElementById("add-education");
+  const addProjectButton = document.getElementById("add-project");
+
+  const updatePreviewText = (input) => {
+    const targetId = input.dataset.previewTarget;
+    if (!targetId) {
+      return;
+    }
+    const target = document.getElementById(targetId);
+    if (!target) {
+      return;
+    }
+    const value = input.value.trim();
+    const placeholder = target.dataset.placeholder || "";
+    target.textContent = value || placeholder;
+    target.classList.toggle("placeholder", !value);
+  };
+
+  const getFieldValue = (item, field) => {
+    const input = item.querySelector(`[data-field="${field}"]`);
+    return input ? input.value.trim() : "";
+  };
+
+  const splitLines = (value) =>
+    value
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+  const createPreviewItem = ({ title, meta, summary, bullets, link }) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "preview-item";
+
+    if (title) {
+      const titleEl = document.createElement("h4");
+      titleEl.textContent = title;
+      wrapper.appendChild(titleEl);
+    }
+
+    if (meta) {
+      const metaEl = document.createElement("div");
+      metaEl.className = "preview-meta";
+      metaEl.textContent = meta;
+      wrapper.appendChild(metaEl);
+    }
+
+    if (summary) {
+      const summaryEl = document.createElement("p");
+      summaryEl.textContent = summary;
+      wrapper.appendChild(summaryEl);
+    }
+
+    if (link) {
+      const linkEl = document.createElement("a");
+      linkEl.href = link;
+      linkEl.textContent = link;
+      linkEl.className = "preview-meta";
+      wrapper.appendChild(linkEl);
+    }
+
+    if (bullets && bullets.length > 0) {
+      const list = document.createElement("ul");
+      bullets.forEach((bullet) => {
+        const li = document.createElement("li");
+        li.textContent = bullet;
+        list.appendChild(li);
+      });
+      wrapper.appendChild(list);
+    }
+
+    return wrapper;
+  };
+
+  const setEmptyState = (container, message) => {
+    container.innerHTML = "";
+    const empty = document.createElement("p");
+    empty.className = "muted placeholder";
+    empty.textContent = message;
+    container.appendChild(empty);
+  };
+
+  const updateSkillsPreview = () => {
+    if (!previewSkills) {
+      return;
+    }
+    const skills = skillsInput ? skillsInput.value : "";
+    const list = skills
+      .split(",")
+      .map((skill) => skill.trim())
+      .filter(Boolean);
+
+    previewSkills.innerHTML = "";
+    if (list.length === 0) {
+      const pill = document.createElement("span");
+      pill.className = "skill-pill placeholder";
+      pill.textContent = "Add skills separated by commas";
+      previewSkills.appendChild(pill);
+      return;
+    }
+
+    list.forEach((skill) => {
+      const pill = document.createElement("span");
+      pill.className = "skill-pill";
+      pill.textContent = skill;
+      previewSkills.appendChild(pill);
+    });
+  };
+
+  const updateExperiencePreview = () => {
+    if (!previewExperience || !experienceList) {
+      return;
+    }
+    previewExperience.innerHTML = "";
+    const items = Array.from(experienceList.querySelectorAll(".repeat-item"));
+    let hasContent = false;
+
+    items.forEach((item) => {
+      const role = getFieldValue(item, "role");
+      const company = getFieldValue(item, "company");
+      const dates = getFieldValue(item, "dates");
+      const achievements = getFieldValue(item, "achievements");
+
+      if (!role && !company && !dates && !achievements) {
+        return;
+      }
+
+      hasContent = true;
+      const metaParts = [];
+      if (role && company) {
+        metaParts.push(company);
+      }
+      if (dates) {
+        metaParts.push(dates);
+      }
+      const previewItem = createPreviewItem({
+        title: role || company,
+        meta: metaParts.join(" | "),
+        bullets: splitLines(achievements),
+      });
+      previewExperience.appendChild(previewItem);
+    });
+
+    if (!hasContent) {
+      setEmptyState(previewExperience, "Add experience entries to show them here.");
+    }
+  };
+
+  const updateEducationPreview = () => {
+    if (!previewEducation || !educationList) {
+      return;
+    }
+    previewEducation.innerHTML = "";
+    const items = Array.from(educationList.querySelectorAll(".repeat-item"));
+    let hasContent = false;
+
+    items.forEach((item) => {
+      const degree = getFieldValue(item, "degree");
+      const school = getFieldValue(item, "school");
+      const dates = getFieldValue(item, "dates");
+      const details = getFieldValue(item, "details");
+
+      if (!degree && !school && !dates && !details) {
+        return;
+      }
+
+      hasContent = true;
+      const metaParts = [];
+      if (degree && school) {
+        metaParts.push(school);
+      }
+      if (dates) {
+        metaParts.push(dates);
+      }
+      const previewItem = createPreviewItem({
+        title: degree || school,
+        meta: metaParts.join(" | "),
+        summary: details,
+      });
+      previewEducation.appendChild(previewItem);
+    });
+
+    if (!hasContent) {
+      setEmptyState(previewEducation, "Add education entries to show them here.");
+    }
+  };
+
+  const updateProjectPreview = () => {
+    if (!previewProjects || !projectList) {
+      return;
+    }
+    previewProjects.innerHTML = "";
+    const items = Array.from(projectList.querySelectorAll(".repeat-item"));
+    let hasContent = false;
+
+    items.forEach((item) => {
+      const project = getFieldValue(item, "project");
+      const link = getFieldValue(item, "link");
+      const summary = getFieldValue(item, "summary");
+
+      if (!project && !link && !summary) {
+        return;
+      }
+
+      hasContent = true;
+      const previewItem = createPreviewItem({
+        title: project || "Project",
+        link: link || "",
+        summary,
+      });
+      previewProjects.appendChild(previewItem);
+    });
+
+    if (!hasContent) {
+      setEmptyState(previewProjects, "Add project entries to show them here.");
+    }
+  };
+
+  const addRepeatItem = (template, list) => {
+    if (!template || !list) {
+      return;
+    }
+    const clone = template.content.cloneNode(true);
+    list.appendChild(clone);
+  };
+
+  const clearItemFields = (item) => {
+    item.querySelectorAll("input, textarea").forEach((field) => {
+      field.value = "";
+    });
+  };
+
+  previewInputs.forEach((input) => updatePreviewText(input));
+  updateSkillsPreview();
+  updateExperiencePreview();
+  updateEducationPreview();
+  updateProjectPreview();
+
+  resumeBuilder.addEventListener("input", (event) => {
+    const target = event.target;
+    if (target.dataset && target.dataset.previewTarget) {
+      updatePreviewText(target);
+    }
+    if (skillsInput && target === skillsInput) {
+      updateSkillsPreview();
+    }
+    if (target.closest("#experience-list")) {
+      updateExperiencePreview();
+    }
+    if (target.closest("#education-list")) {
+      updateEducationPreview();
+    }
+    if (target.closest("#project-list")) {
+      updateProjectPreview();
+    }
+  });
+
+  resumeBuilder.addEventListener("click", (event) => {
+    const removeButton = event.target.closest("[data-remove]");
+    if (!removeButton) {
+      return;
+    }
+    event.preventDefault();
+    const item = removeButton.closest(".repeat-item");
+    if (!item || !item.parentElement) {
+      return;
+    }
+    const siblings = item.parentElement.querySelectorAll(".repeat-item");
+    if (siblings.length > 1) {
+      item.remove();
+    } else {
+      clearItemFields(item);
+    }
+    updateExperiencePreview();
+    updateEducationPreview();
+    updateProjectPreview();
+  });
+
+  if (addExperienceButton) {
+    addExperienceButton.addEventListener("click", () => {
+      addRepeatItem(experienceTemplate, experienceList);
+      updateExperiencePreview();
+    });
+  }
+
+  if (addEducationButton) {
+    addEducationButton.addEventListener("click", () => {
+      addRepeatItem(educationTemplate, educationList);
+      updateEducationPreview();
+    });
+  }
+
+  if (addProjectButton) {
+    addProjectButton.addEventListener("click", () => {
+      addRepeatItem(projectTemplate, projectList);
+      updateProjectPreview();
+    });
+  }
+}
