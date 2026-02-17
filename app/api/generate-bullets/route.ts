@@ -1,18 +1,15 @@
-import OpenAI from "openai";
+import { generateText } from "ai";
+import { openai } from "@ai-sdk/openai";
+import { xai } from "@ai-sdk/xai";
 import { NextResponse } from "next/server";
 
 import { fallbackBullets } from "@/lib/ai";
+import { getAiProvider } from "@/lib/integrations";
 import { getClientIp, isSameOrigin } from "@/lib/request";
 import { rateLimit } from "@/lib/rate-limit";
 import { sanitizeMultiline, sanitizeText } from "@/lib/sanitize";
 import { getSessionUserId } from "@/lib/session";
 import { generateBulletsSchema } from "@/lib/validation";
-
-const openai = process.env.OPENAI_API_KEY
-  ? new OpenAI({
-      apiKey: process.env.OPENAI_API_KEY,
-    })
-  : null;
 
 function cleanBullets(rawOutput: string) {
   return rawOutput
@@ -22,6 +19,58 @@ function cleanBullets(rawOutput: string) {
     .filter(Boolean)
     .filter((line) => line.length > 10)
     .slice(0, 5);
+}
+
+const aiSystemPrompt =
+  "You write resume bullets for students and entry-level candidates. Return 3-5 concise bullet lines only. Start each line with an action verb. Prefer quantified outcomes when plausible. No intro text.";
+
+function buildUserPrompt(input: {
+  role: string;
+  organization: string;
+  description: string;
+}) {
+  return `Role: ${input.role}\nOrganization: ${input.organization}\nWhat I did: ${input.description}`;
+}
+
+async function generateWithConfiguredProvider(input: {
+  role: string;
+  organization: string;
+  description: string;
+}) {
+  const prompt = buildUserPrompt(input);
+  const provider = getAiProvider();
+
+  if (provider === "xai") {
+    const result = await generateText({
+      model: xai(process.env.XAI_MODEL ?? "grok-2-1212"),
+      system: aiSystemPrompt,
+      prompt,
+      temperature: 0.4,
+      maxOutputTokens: 350,
+    });
+
+    return {
+      source: "xai" as const,
+      bullets: cleanBullets(result.text),
+    };
+  }
+
+  if (provider === "openai") {
+    const result = await generateText({
+      model: openai(process.env.OPENAI_MODEL ?? "gpt-4.1-mini"),
+      system: aiSystemPrompt,
+      prompt,
+      temperature: 0.4,
+      maxOutputTokens: 350,
+    });
+
+    return {
+      source: "openai" as const,
+      bullets: cleanBullets(result.text),
+    };
+  }
+
+  return null;
 }
 
 export async function POST(request: Request) {
@@ -76,31 +125,16 @@ export async function POST(request: Request) {
 
   const fallback = fallbackBullets(parsed.data);
 
-  if (!openai) {
+  const provider = getAiProvider();
+
+  if (provider === "none") {
     return NextResponse.json({ bullets: fallback, source: "fallback" });
   }
 
   try {
-    const response = await openai.responses.create({
-      model: process.env.OPENAI_MODEL ?? "gpt-4.1-mini",
-      temperature: 0.4,
-      max_output_tokens: 350,
-      input: [
-        {
-          role: "system",
-          content:
-            "You write resume bullets for students and entry-level candidates. Return 3-5 concise bullet lines only. Start each line with an action verb. Prefer quantified outcomes when plausible. No intro text.",
-        },
-        {
-          role: "user",
-          content: `Role: ${parsed.data.role}\nOrganization: ${parsed.data.organization}\nWhat I did: ${parsed.data.description}`,
-        },
-      ],
-    });
+    const response = await generateWithConfiguredProvider(parsed.data);
 
-    const aiBullets = cleanBullets(response.output_text ?? "");
-
-    if (aiBullets.length < 3) {
+    if (!response || response.bullets.length < 3) {
       return NextResponse.json({
         bullets: fallback,
         source: "fallback",
@@ -108,8 +142,8 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({
-      bullets: aiBullets,
-      source: "openai",
+      bullets: response.bullets,
+      source: response.source,
     });
   } catch {
     return NextResponse.json({

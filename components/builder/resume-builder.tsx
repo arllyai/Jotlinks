@@ -18,6 +18,7 @@ import {
   createEmptyExperience,
   createEmptyProject,
 } from "@/lib/default-resume";
+import { getClientBaseUrl } from "@/lib/app-url";
 import type {
   ActivityItem,
   EducationItem,
@@ -323,7 +324,10 @@ export function ResumeBuilder({ initialResume }: { initialResume: BuilderResume 
         return;
       }
 
-      const result = (await response.json()) as { bullets: string[] };
+      const result = (await response.json()) as {
+        bullets: string[];
+        source?: "xai" | "openai" | "fallback";
+      };
 
       if (kind === "experience") {
         updateExperience(payload.id, { bullets: result.bullets });
@@ -331,7 +335,11 @@ export function ResumeBuilder({ initialResume }: { initialResume: BuilderResume 
         updateProject(payload.id, { bullets: result.bullets });
       }
 
-      setStatusMessage("AI bullets generated.");
+      setStatusMessage(
+        result.source && result.source !== "fallback"
+          ? `AI bullets generated via ${result.source.toUpperCase()}.`
+          : "AI bullets generated.",
+      );
       setGeneratingId(null);
     });
   };
@@ -354,7 +362,7 @@ export function ResumeBuilder({ initialResume }: { initialResume: BuilderResume 
   };
 
   const copyPublicLink = async () => {
-    await navigator.clipboard.writeText(`${window.location.origin}${publicUrl}`);
+    await navigator.clipboard.writeText(`${getClientBaseUrl()}${publicUrl}`);
     setStatusMessage("Public link copied to clipboard.");
   };
 

@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { FirebaseAnalytics } from "@/components/firebase/firebase-analytics";
 import { Providers } from "@/components/providers";
 import { Navbar } from "@/components/navbar";
+import { getMetadataBase } from "@/lib/integrations";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -18,6 +20,7 @@ export const metadata: Metadata = {
   title: "Jotlinks - AI Resume Builder for Students",
   description:
     "Build internship-ready resumes with AI-generated accomplishment bullets.",
+  metadataBase: getMetadataBase(),
 };
 
 export default function RootLayout({
@@ -31,6 +34,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Providers>
+          <FirebaseAnalytics />
           <Navbar />
           <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">{children}</main>
         </Providers>

@@ -1,8 +1,10 @@
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 
+import { IntegrationStatus } from "@/components/dashboard/integration-status";
 import { ResumeList } from "@/components/dashboard/resume-list";
 import { authOptions } from "@/lib/auth-options";
+import { getIntegrationStatus } from "@/lib/integrations";
 import { prisma } from "@/lib/prisma";
 
 export default async function DashboardPage() {
@@ -31,12 +33,15 @@ export default async function DashboardPage() {
   });
 
   return (
-    <ResumeList
-      initialResumes={resumes.map((resume) => ({
-        ...resume,
-        updatedAt: resume.updatedAt.toISOString(),
-        createdAt: resume.createdAt.toISOString(),
-      }))}
-    />
+    <div className="space-y-6">
+      <IntegrationStatus status={getIntegrationStatus()} />
+      <ResumeList
+        initialResumes={resumes.map((resume) => ({
+          ...resume,
+          updatedAt: resume.updatedAt.toISOString(),
+          createdAt: resume.createdAt.toISOString(),
+        }))}
+      />
+    </div>
   );
 }

@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
+import { getClientBaseUrl } from "@/lib/app-url";
+
 type ResumeListItem = {
   id: string;
   title: string;
@@ -127,7 +129,7 @@ export function ResumeList({ initialResumes }: { initialResumes: ResumeListItem[
   };
 
   const copyLink = async (slug: string) => {
-    const url = `${window.location.origin}/r/${slug}`;
+    const url = `${getClientBaseUrl()}/r/${slug}`;
     await navigator.clipboard.writeText(url);
     setMessage("Public link copied to clipboard.");
   };
