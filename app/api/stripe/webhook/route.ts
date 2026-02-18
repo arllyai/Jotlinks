@@ -55,6 +55,18 @@ async function resolveUserId({
   return user?.id ?? null;
 }
 
+function getSubscriptionCurrentPeriodEnd(subscription: Stripe.Subscription) {
+  const periodEnds = subscription.items.data
+    .map((item) => item.current_period_end)
+    .filter((value): value is number => typeof value === "number" && value > 0);
+
+  if (!periodEnds.length) {
+    return null;
+  }
+
+  return unixToDate(Math.max(...periodEnds));
+}
+
 async function syncUserFromSubscription(
   subscription: Stripe.Subscription,
   metadataUserId?: string | null,
@@ -75,7 +87,7 @@ async function syncUserFromSubscription(
       stripeCustomerId: customerId ?? undefined,
       stripeSubscriptionId: subscription.id,
       stripeSubscriptionStatus: subscription.status,
-      stripeCurrentPeriodEnd: unixToDate(subscription.current_period_end),
+      stripeCurrentPeriodEnd: getSubscriptionCurrentPeriodEnd(subscription),
       stripeTrialEndsAt: unixToDate(subscription.trial_end),
     },
   });

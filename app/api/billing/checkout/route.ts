@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import type Stripe from "stripe";
-
 import { getServerBaseUrl } from "@/lib/app-url";
 import { getUserBillingState } from "@/lib/billing";
 import { prisma } from "@/lib/prisma";
@@ -132,7 +130,11 @@ export async function POST(request: Request) {
   const successUrl = `${baseUrl}/dashboard/resumes/${resumeId}?billing=success`;
   const cancelUrl = `${baseUrl}/dashboard/resumes/${resumeId}?billing=cancel`;
 
-  const addInvoiceItem: Stripe.Checkout.SessionCreateParams.SubscriptionData.AddInvoiceItem =
+  const lineItems = [
+    {
+      price: pricing.monthlyPriceId,
+      quantity: 1,
+    },
     pricing.trialFeePriceId
       ? {
           price: pricing.trialFeePriceId,
@@ -147,7 +149,8 @@ export async function POST(request: Request) {
             },
           },
           quantity: 1,
-        };
+        },
+  ];
 
   const session = await stripe.checkout.sessions.create({
     mode: "subscription",
@@ -157,12 +160,7 @@ export async function POST(request: Request) {
     allow_promotion_codes: true,
     billing_address_collection: "auto",
     payment_method_collection: "always",
-    line_items: [
-      {
-        price: pricing.monthlyPriceId,
-        quantity: 1,
-      },
-    ],
+    line_items: lineItems,
     metadata: {
       userId,
       resumeId,
@@ -173,7 +171,6 @@ export async function POST(request: Request) {
         userId,
         resumeId,
       },
-      add_invoice_items: [addInvoiceItem],
     },
   });
 
