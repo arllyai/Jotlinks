@@ -19,6 +19,7 @@ import {
   createEmptyProject,
 } from "@/lib/default-resume";
 import { getClientBaseUrl } from "@/lib/app-url";
+import { isResumeReadyForCheckout } from "@/lib/resume-completion";
 import type {
   ActivityItem,
   EducationItem,
@@ -38,6 +39,27 @@ type BuilderResume = {
   slug: string;
   data: ResumeData;
 };
+
+type BillingState = {
+  hasAccess: boolean;
+  status: string;
+  trialEndsAt: string | null;
+  currentPeriodEnd: string | null;
+};
+
+function formatBillingDate(value: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  try {
+    return new Intl.DateTimeFormat("en-US", { dateStyle: "medium" }).format(
+      new Date(value),
+    );
+  } catch {
+    return null;
+  }
+}
 
 function FormLabel({ children }: { children: ReactNode }) {
   return (
@@ -128,18 +150,34 @@ function SectionOrderControls({
   );
 }
 
-export function ResumeBuilder({ initialResume }: { initialResume: BuilderResume }) {
+export function ResumeBuilder({
+  initialResume,
+  billing,
+}: {
+  initialResume: BuilderResume;
+  billing: BillingState;
+}) {
   const [title, setTitle] = useState(initialResume.title);
   const [template, setTemplate] = useState<ResumeTemplate>(initialResume.template);
-  const [isPublic, setIsPublic] = useState(initialResume.isPublic);
+  const [isPublic, setIsPublic] = useState(
+    billing.hasAccess ? initialResume.isPublic : false,
+  );
   const [data, setData] = useState<ResumeData>(initialResume.data);
   const [dirty, setDirty] = useState(false);
   const [saveState, setSaveState] = useState<"saved" | "saving" | "error">("saved");
   const [statusMessage, setStatusMessage] = useState("");
   const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [isBillingPending, setIsBillingPending] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const publicUrl = useMemo(() => `/r/${initialResume.slug}`, [initialResume.slug]);
+  const hasPaidAccess = billing.hasAccess;
+  const resumeReadyForCheckout = useMemo(
+    () => isResumeReadyForCheckout(data),
+    [data],
+  );
+  const trialEndsText = formatBillingDate(billing.trialEndsAt);
+  const currentPeriodEndText = formatBillingDate(billing.currentPeriodEnd);
 
   const markDirty = () => {
     setDirty(true);
@@ -162,8 +200,13 @@ export function ResumeBuilder({ initialResume }: { initialResume: BuilderResume 
     });
 
     if (!response.ok) {
+      const result = (await response.json().catch(() => null)) as
+        | { error?: string }
+        | null;
       setSaveState("error");
-      setStatusMessage("Autosave failed. Keep editing and we will retry.");
+      setStatusMessage(
+        result?.error ?? "Autosave failed. Keep editing and we will retry.",
+      );
       return;
     }
 
@@ -344,11 +387,85 @@ export function ResumeBuilder({ initialResume }: { initialResume: BuilderResume 
     });
   };
 
+  const startCheckout = async () => {
+    if (!resumeReadyForCheckout) {
+      setStatusMessage(
+        "Add your name, email, and at least one section entry before payment.",
+      );
+      return;
+    }
+
+    setIsBillingPending(true);
+    setStatusMessage("");
+
+    try {
+      const response = await fetch("/api/billing/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          resumeId: initialResume.id,
+        }),
+      });
+
+      const result = (await response.json().catch(() => null)) as
+        | { url?: string; redirectUrl?: string; error?: string }
+        | null;
+
+      if (!response.ok || (!result?.url && !result?.redirectUrl)) {
+        setStatusMessage(result?.error ?? "Unable to start payment checkout.");
+        return;
+      }
+
+      const targetUrl = result.url ?? result.redirectUrl;
+      if (targetUrl) {
+        window.location.href = targetUrl;
+      }
+    } finally {
+      setIsBillingPending(false);
+    }
+  };
+
+  const openBillingPortal = async () => {
+    setIsBillingPending(true);
+    setStatusMessage("");
+
+    try {
+      const response = await fetch("/api/billing/portal", {
+        method: "POST",
+      });
+
+      const result = (await response.json().catch(() => null)) as
+        | { url?: string; error?: string }
+        | null;
+
+      if (!response.ok || !result?.url) {
+        setStatusMessage(result?.error ?? "Unable to open billing portal.");
+        return;
+      }
+
+      window.location.href = result.url;
+    } finally {
+      setIsBillingPending(false);
+    }
+  };
+
   const downloadPdf = async () => {
+    if (!hasPaidAccess) {
+      setStatusMessage(
+        "Payment required. Complete checkout to unlock PDF downloads.",
+      );
+      return;
+    }
+
     const response = await fetch(`/api/resumes/${initialResume.id}/pdf`);
 
     if (!response.ok) {
-      setStatusMessage("Unable to export PDF right now.");
+      const result = (await response.json().catch(() => null)) as
+        | { error?: string }
+        | null;
+      setStatusMessage(result?.error ?? "Unable to export PDF right now.");
       return;
     }
 
@@ -362,6 +479,13 @@ export function ResumeBuilder({ initialResume }: { initialResume: BuilderResume 
   };
 
   const copyPublicLink = async () => {
+    if (!hasPaidAccess) {
+      setStatusMessage(
+        "Payment required. Complete checkout to unlock public links.",
+      );
+      return;
+    }
+
     await navigator.clipboard.writeText(`${getClientBaseUrl()}${publicUrl}`);
     setStatusMessage("Public link copied to clipboard.");
   };
@@ -388,10 +512,17 @@ export function ResumeBuilder({ initialResume }: { initialResume: BuilderResume 
           <button
             type="button"
             onClick={() => {
+              if (!hasPaidAccess) {
+                setStatusMessage(
+                  "Payment required. Complete checkout before enabling a public link.",
+                );
+                return;
+              }
               setIsPublic((value) => !value);
               markDirty();
             }}
-            className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-200"
+            disabled={!hasPaidAccess}
+            className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 transition disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-200"
           >
             {isPublic ? "Public Link On" : "Make Public"}
           </button>
@@ -399,7 +530,8 @@ export function ResumeBuilder({ initialResume }: { initialResume: BuilderResume 
             <button
               type="button"
               onClick={copyPublicLink}
-              className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-200"
+              disabled={!hasPaidAccess}
+              className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 transition disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-200"
             >
               Copy Public Link
             </button>
@@ -407,12 +539,72 @@ export function ResumeBuilder({ initialResume }: { initialResume: BuilderResume 
           <button
             type="button"
             onClick={downloadPdf}
-            className="rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-sky-500"
+            disabled={!hasPaidAccess}
+            className="rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
           >
             Download PDF
           </button>
         </div>
       </div>
+
+      <section
+        className={`rounded-2xl border p-4 ${
+          hasPaidAccess
+            ? "border-emerald-200 bg-emerald-50/70 dark:border-emerald-900/50 dark:bg-emerald-900/20"
+            : "border-sky-200 bg-sky-50/70 dark:border-sky-900/40 dark:bg-sky-900/20"
+        }`}
+      >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="max-w-2xl space-y-1">
+            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              {hasPaidAccess ? "Premium access is active" : "Unlock Export & Sharing"}
+            </h2>
+            {hasPaidAccess ? (
+              <p className="text-sm text-zinc-700 dark:text-zinc-200">
+                Subscription status:{" "}
+                <span className="font-medium capitalize">{billing.status}</span>
+                {trialEndsText ? ` · Trial ends ${trialEndsText}` : ""}
+                {currentPeriodEndText ? ` · Current period ends ${currentPeriodEndText}` : ""}
+              </p>
+            ) : (
+              <p className="text-sm text-zinc-700 dark:text-zinc-200">
+                After your resume is ready, checkout to start billing:{" "}
+                <span className="font-semibold">$1.99 today</span> for a 7-day trial,
+                then <span className="font-semibold">$9.99/month</span>.
+              </p>
+            )}
+            {!hasPaidAccess && (
+              <p className="text-xs text-zinc-600 dark:text-zinc-300">
+                Required before checkout: name + email in Personal Information and at
+                least one core section entry (education, experience, project, or
+                activity).
+              </p>
+            )}
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {hasPaidAccess ? (
+              <button
+                type="button"
+                onClick={openBillingPortal}
+                disabled={isBillingPending}
+                className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              >
+                {isBillingPending ? "Opening..." : "Manage Billing"}
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={startCheckout}
+                disabled={isBillingPending || !resumeReadyForCheckout}
+                className="rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
+              >
+                {isBillingPending ? "Redirecting..." : "Continue to Payment"}
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
 
       <div className="flex flex-wrap items-center gap-2 text-xs">
         <span

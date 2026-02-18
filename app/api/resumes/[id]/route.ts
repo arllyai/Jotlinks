@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 
+import { getUserBillingState } from "@/lib/billing";
 import { prisma } from "@/lib/prisma";
 import { isSameOrigin } from "@/lib/request";
 import { sanitizeResumeData, sanitizeText } from "@/lib/sanitize";
@@ -88,6 +89,19 @@ export async function PATCH(request: Request, { params }: Params) {
       { error: "Unable to validate resume changes." },
       { status: 400 },
     );
+  }
+
+  if (parsed.data.isPublic) {
+    const billingState = await getUserBillingState(userId);
+    if (!billingState.hasAccess) {
+      return NextResponse.json(
+        {
+          error:
+            "Payment required. Complete checkout before enabling public sharing.",
+        },
+        { status: 402 },
+      );
+    }
   }
 
   const resume = await prisma.resume.updateMany({

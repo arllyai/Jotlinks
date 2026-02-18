@@ -118,8 +118,11 @@ export function ResumeList({ initialResumes }: { initialResumes: ResumeListItem[
       });
 
       if (!response.ok) {
+        const result = (await response.json().catch(() => null)) as
+          | { error?: string }
+          | null;
         setResumes(previous);
-        setMessage("Could not update sharing setting.");
+        setMessage(result?.error ?? "Could not update sharing setting.");
         return;
       }
 

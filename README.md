@@ -19,6 +19,7 @@ It helps users:
 - **Database:** PostgreSQL with Prisma ORM
 - **AI:** Vercel AI SDK with xAI (Grok) + OpenAI fallback (`/api/generate-bullets`)
 - **PDF:** `pdf-lib`
+- **Payments:** Stripe Checkout + Billing Portal + webhooks
 - **Integrations:** Firebase (Web + Admin SDK) and Supabase client/server SDKs
 
 ## Features Implemented
@@ -45,6 +46,11 @@ It helps users:
 - PDF export endpoint
 - Shareable public resume links
 - Autosave every few seconds
+- Stripe billing flow with paid trial:
+  - $1.99 trial charge
+  - 7-day trial period
+  - $9.99/month subscription after trial
+- Payment-gated PDF export + public sharing
 - Dashboard integration status panel (`/api/integrations/status`)
 
 ## Security Notes
@@ -57,6 +63,7 @@ It helps users:
 - Same-origin checks are used on mutating endpoints
 - Prisma parameterized queries reduce SQL injection risk
 - Supabase service-role usage is server-only (never exposed to client)
+- Stripe webhook signature verification is enforced (`STRIPE_WEBHOOK_SECRET`)
 
 ## Project Structure
 
@@ -64,7 +71,9 @@ It helps users:
 app/
   api/
     auth/
+    billing/
     generate-bullets/
+    stripe/
     resumes/
   dashboard/
   login/
@@ -80,7 +89,9 @@ components/
 lib/
   app-url.ts
   auth-options.ts
+  billing.ts
   integrations.ts
+  stripe.ts
   firebase/
   supabase/
   prisma.ts
@@ -109,6 +120,14 @@ Required:
 
 Optional:
 
+- Stripe billing:
+  - `STRIPE_SECRET_KEY`
+  - `STRIPE_WEBHOOK_SECRET`
+  - `STRIPE_MONTHLY_PRICE_ID` (recurring monthly $9.99 price ID)
+  - `STRIPE_TRIAL_FEE_PRICE_ID` (optional one-time $1.99 price ID; fallback uses cents config)
+  - `STRIPE_TRIAL_DAYS` (default `7`)
+  - `STRIPE_TRIAL_FEE_CENTS` (default `199`)
+  - `STRIPE_CURRENCY` (default `usd`)
 - `AI_PROVIDER` - `auto` (default), `xai`, or `openai`
 - `XAI_API_KEY` - enables xAI via Vercel AI SDK
 - `XAI_MODEL` - defaults to `grok-2-1212`
@@ -209,6 +228,31 @@ Optional:
    - `NEXTAUTH_URL=https://your-domain.com`
 5. Redeploy so the app uses your production canonical URL.
 
+### 5) Connect Stripe (Paid trial + monthly billing)
+
+1. Create Stripe products/prices:
+   - Monthly subscription price at **$9.99 / month** (`STRIPE_MONTHLY_PRICE_ID`)
+   - Optional one-time price at **$1.99** (`STRIPE_TRIAL_FEE_PRICE_ID`)
+2. Add Stripe env vars in Vercel:
+   - `STRIPE_SECRET_KEY`
+   - `STRIPE_WEBHOOK_SECRET`
+   - `STRIPE_MONTHLY_PRICE_ID`
+   - `STRIPE_TRIAL_FEE_PRICE_ID` (optional)
+   - `STRIPE_TRIAL_DAYS=7`
+   - `STRIPE_TRIAL_FEE_CENTS=199` (fallback if trial price ID is omitted)
+3. Configure Stripe webhook endpoint:
+   - URL: `https://your-domain.com/api/stripe/webhook`
+   - Events:
+     - `checkout.session.completed`
+     - `customer.subscription.created`
+     - `customer.subscription.updated`
+     - `customer.subscription.deleted`
+     - `invoice.payment_failed`
+4. This app starts checkout only after key resume fields are completed, then:
+   - Charges trial fee
+   - Starts 7-day trial window
+   - Continues at $9.99/month
+
 ## Database Schema
 
 Main models:
@@ -235,6 +279,9 @@ Schema file:
 - `POST /api/resumes/:id/publish`
 - `GET /api/resumes/:id/pdf`
 - `POST /api/generate-bullets`
+- `POST /api/billing/checkout`
+- `POST /api/billing/portal`
+- `POST /api/stripe/webhook`
 - `GET /api/integrations/status`
 
 ## Deployment (Vercel Recommended)

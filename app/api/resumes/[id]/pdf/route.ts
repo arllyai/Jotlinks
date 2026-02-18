@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { Buffer } from "node:buffer";
 
+import { getUserBillingState } from "@/lib/billing";
 import { buildResumePdf } from "@/lib/pdf";
 import { prisma } from "@/lib/prisma";
 import { getSessionUserId } from "@/lib/session";
@@ -16,6 +17,17 @@ export async function GET(_request: Request, { params }: Params) {
   const userId = await getSessionUserId();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const billingState = await getUserBillingState(userId);
+  if (!billingState.hasAccess) {
+    return NextResponse.json(
+      {
+        error:
+          "Payment required. Complete checkout to export your resume as PDF.",
+      },
+      { status: 402 },
+    );
   }
 
   const { id } = await params;

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { getUserBillingState } from "@/lib/billing";
 import { prisma } from "@/lib/prisma";
 import { isSameOrigin } from "@/lib/request";
 import { getSessionUserId } from "@/lib/session";
@@ -29,6 +30,19 @@ export async function POST(request: Request, { params }: Params) {
 
   const { id } = await params;
   const isPublic = (body as Record<string, unknown>)?.isPublic === true;
+
+  if (isPublic) {
+    const billingState = await getUserBillingState(userId);
+    if (!billingState.hasAccess) {
+      return NextResponse.json(
+        {
+          error:
+            "Payment required. Complete checkout before publishing a public link.",
+        },
+        { status: 402 },
+      );
+    }
+  }
 
   const result = await prisma.resume.updateMany({
     where: {

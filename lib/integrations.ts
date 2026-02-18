@@ -69,6 +69,14 @@ export function isSupabaseDatabaseConfigured() {
   return databaseUrl.includes("supabase");
 }
 
+export function isStripeConfigured() {
+  return Boolean(
+    process.env.STRIPE_SECRET_KEY &&
+      process.env.STRIPE_MONTHLY_PRICE_ID &&
+      process.env.STRIPE_WEBHOOK_SECRET,
+  );
+}
+
 export function getAiProvider() {
   const configuredProvider = (process.env.AI_PROVIDER ?? "auto").toLowerCase();
 
@@ -105,6 +113,14 @@ export function getIntegrationStatus() {
       clientConfigured: isSupabaseConfigured(),
       serverConfigured: isSupabaseServerConfigured(),
       databaseConfigured: isSupabaseDatabaseConfigured(),
+    },
+    stripe: {
+      configured: isStripeConfigured(),
+      monthlyPriceConfigured: Boolean(process.env.STRIPE_MONTHLY_PRICE_ID),
+      trialFeeConfigured: Boolean(process.env.STRIPE_TRIAL_FEE_PRICE_ID),
+      webhookConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
+      trialDays: Number(process.env.STRIPE_TRIAL_DAYS ?? "7"),
+      trialFeeCents: Number(process.env.STRIPE_TRIAL_FEE_CENTS ?? "199"),
     },
     ai: {
       provider: aiProvider,

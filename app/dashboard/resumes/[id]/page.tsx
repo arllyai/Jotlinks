@@ -3,6 +3,7 @@ import { getServerSession } from "next-auth";
 
 import { ResumeBuilder } from "@/components/builder/resume-builder";
 import { authOptions } from "@/lib/auth-options";
+import { hasBillingAccessFromStatus } from "@/lib/billing";
 import { prisma } from "@/lib/prisma";
 import { resumeDataSchema, resumeTemplateSchema } from "@/lib/validation";
 
@@ -44,6 +45,19 @@ export default async function ResumeBuilderPage({
     notFound();
   }
 
+  const user = await prisma.user.findUnique({
+    where: {
+      id: session.user.id,
+    },
+    select: {
+      stripeSubscriptionStatus: true,
+      stripeTrialEndsAt: true,
+      stripeCurrentPeriodEnd: true,
+    },
+  });
+
+  const billingStatus = user?.stripeSubscriptionStatus ?? "inactive";
+
   return (
     <ResumeBuilder
       initialResume={{
@@ -53,6 +67,12 @@ export default async function ResumeBuilderPage({
         isPublic: resume.isPublic,
         slug: resume.slug,
         data: dataValidation.data,
+      }}
+      billing={{
+        hasAccess: hasBillingAccessFromStatus(billingStatus),
+        status: billingStatus,
+        trialEndsAt: user?.stripeTrialEndsAt?.toISOString() ?? null,
+        currentPeriodEnd: user?.stripeCurrentPeriodEnd?.toISOString() ?? null,
       }}
     />
   );

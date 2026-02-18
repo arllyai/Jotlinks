@@ -10,6 +10,14 @@ type IntegrationStatus = {
     serverConfigured: boolean;
     databaseConfigured: boolean;
   };
+  stripe: {
+    configured: boolean;
+    monthlyPriceConfigured: boolean;
+    trialFeeConfigured: boolean;
+    webhookConfigured: boolean;
+    trialDays: number;
+    trialFeeCents: number;
+  };
   ai: {
     provider: string;
     xaiConfigured: boolean;
@@ -117,6 +125,32 @@ export function IntegrationStatus({
           <p className="text-xs text-zinc-600 dark:text-zinc-300">
             OpenAI fallback:{" "}
             {status.ai.openaiConfigured ? status.ai.openaiModel : "not configured"}
+          </p>
+        </article>
+
+        <article className="rounded-xl border border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-800/40">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+              Stripe Billing
+            </h3>
+            <StatusBadge ok={status.stripe.configured} />
+          </div>
+          <p className="mt-2 text-xs text-zinc-600 dark:text-zinc-300">
+            Monthly price ID:{" "}
+            {status.stripe.monthlyPriceConfigured ? "configured" : "missing"}
+          </p>
+          <p className="text-xs text-zinc-600 dark:text-zinc-300">
+            Trial fee config:{" "}
+            {status.stripe.trialFeeConfigured
+              ? "price ID configured"
+              : `$${(status.stripe.trialFeeCents / 100).toFixed(2)} fallback amount`}
+          </p>
+          <p className="text-xs text-zinc-600 dark:text-zinc-300">
+            Trial length: {status.stripe.trialDays} days
+          </p>
+          <p className="text-xs text-zinc-600 dark:text-zinc-300">
+            Webhook secret:{" "}
+            {status.stripe.webhookConfigured ? "configured" : "missing"}
           </p>
         </article>
 
