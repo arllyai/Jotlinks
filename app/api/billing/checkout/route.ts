@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import { getServerBaseUrl } from "@/lib/app-url";
 import { getUserBillingState } from "@/lib/billing";
 import { prisma } from "@/lib/prisma";
-import { isSameOrigin } from "@/lib/request";
+import { getClientIp, isSameOrigin } from "@/lib/request";
+import { rateLimit } from "@/lib/rate-limit";
 import { isResumeReadyForCheckout } from "@/lib/resume-completion";
 import { getSessionUserId } from "@/lib/session";
 import { getStripeClient, getStripePricingConfig } from "@/lib/stripe";
 import { resumeDataSchema } from "@/lib/validation";
+
+export const runtime = "nodejs";
 
 function sanitizeResumeId(value: unknown) {
   return typeof value === "string" ? value.trim().slice(0, 64) : "";
@@ -20,6 +23,20 @@ export async function POST(request: Request) {
   const userId = await getSessionUserId();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const ip = getClientIp(request);
+  const limiter = rateLimit({
+    key: `billing-checkout:${userId}:${ip}`,
+    limit: 10,
+    windowMs: 60_000,
+  });
+
+  if (!limiter.success) {
+    return NextResponse.json(
+      { error: "Too many checkout attempts. Please wait and try again." },
+      { status: 429 },
+    );
   }
 
   const stripe = getStripeClient();
@@ -36,6 +53,34 @@ export async function POST(request: Request) {
       { error: "Monthly Stripe price is not configured." },
       { status: 500 },
     );
+  }
+
+  const monthlyPrice = await stripe.prices.retrieve(pricing.monthlyPriceId);
+  if (
+    !monthlyPrice.active ||
+    !monthlyPrice.recurring ||
+    monthlyPrice.recurring.interval !== "month"
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "Stripe monthly price configuration is invalid. Expected an active monthly recurring price.",
+      },
+      { status: 500 },
+    );
+  }
+
+  if (pricing.trialFeePriceId) {
+    const trialPrice = await stripe.prices.retrieve(pricing.trialFeePriceId);
+    if (!trialPrice.active || Boolean(trialPrice.recurring)) {
+      return NextResponse.json(
+        {
+          error:
+            "Stripe trial fee price configuration is invalid. Expected an active one-time price.",
+        },
+        { status: 500 },
+      );
+    }
   }
 
   let body: unknown;

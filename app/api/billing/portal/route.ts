@@ -2,9 +2,12 @@ import { NextResponse } from "next/server";
 
 import { getServerBaseUrl } from "@/lib/app-url";
 import { prisma } from "@/lib/prisma";
-import { isSameOrigin } from "@/lib/request";
+import { getClientIp, isSameOrigin } from "@/lib/request";
+import { rateLimit } from "@/lib/rate-limit";
 import { getSessionUserId } from "@/lib/session";
 import { getStripeClient } from "@/lib/stripe";
+
+export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   if (!isSameOrigin(request)) {
@@ -14,6 +17,20 @@ export async function POST(request: Request) {
   const userId = await getSessionUserId();
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const ip = getClientIp(request);
+  const limiter = rateLimit({
+    key: `billing-portal:${userId}:${ip}`,
+    limit: 20,
+    windowMs: 60_000,
+  });
+
+  if (!limiter.success) {
+    return NextResponse.json(
+      { error: "Too many billing requests. Please wait and try again." },
+      { status: 429 },
+    );
   }
 
   const stripe = getStripeClient();

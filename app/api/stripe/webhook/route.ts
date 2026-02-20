@@ -4,6 +4,8 @@ import type Stripe from "stripe";
 import { prisma } from "@/lib/prisma";
 import { getStripeClient, unixToDate } from "@/lib/stripe";
 
+export const runtime = "nodejs";
+
 function getCustomerIdFromValue(
   value: string | Stripe.Customer | Stripe.DeletedCustomer | null,
 ) {

@@ -153,14 +153,17 @@ function SectionOrderControls({
 export function ResumeBuilder({
   initialResume,
   billing,
+  billingRedirectStatus,
 }: {
   initialResume: BuilderResume;
   billing: BillingState;
+  billingRedirectStatus?: string | null;
 }) {
+  const [billingState, setBillingState] = useState<BillingState>(billing);
   const [title, setTitle] = useState(initialResume.title);
   const [template, setTemplate] = useState<ResumeTemplate>(initialResume.template);
   const [isPublic, setIsPublic] = useState(
-    billing.hasAccess ? initialResume.isPublic : false,
+    billingState.hasAccess ? initialResume.isPublic : false,
   );
   const [data, setData] = useState<ResumeData>(initialResume.data);
   const [dirty, setDirty] = useState(false);
@@ -171,13 +174,13 @@ export function ResumeBuilder({
   const [isPending, startTransition] = useTransition();
 
   const publicUrl = useMemo(() => `/r/${initialResume.slug}`, [initialResume.slug]);
-  const hasPaidAccess = billing.hasAccess;
+  const hasPaidAccess = billingState.hasAccess;
   const resumeReadyForCheckout = useMemo(
     () => isResumeReadyForCheckout(data),
     [data],
   );
-  const trialEndsText = formatBillingDate(billing.trialEndsAt);
-  const currentPeriodEndText = formatBillingDate(billing.currentPeriodEnd);
+  const trialEndsText = formatBillingDate(billingState.trialEndsAt);
+  const currentPeriodEndText = formatBillingDate(billingState.currentPeriodEnd);
 
   const markDirty = () => {
     setDirty(true);
@@ -226,6 +229,28 @@ export function ResumeBuilder({
 
     return () => clearTimeout(timer);
   }, [dirty, saveResume]);
+
+  useEffect(() => {
+    if (!billingRedirectStatus) {
+      return;
+    }
+
+    if (billingRedirectStatus === "cancel") {
+      setStatusMessage(
+        "Checkout was canceled. You can continue editing and pay when ready.",
+      );
+      return;
+    }
+
+    if (billingRedirectStatus === "active") {
+      setStatusMessage("Your billing is already active.");
+      return;
+    }
+
+    if (billingRedirectStatus === "success" && !hasPaidAccess) {
+      setStatusMessage("Payment received. Verifying your subscription...");
+    }
+  }, [billingRedirectStatus, hasPaidAccess]);
 
   const moveSection = (index: number, direction: "up" | "down") => {
     setData((previous) => {
@@ -386,6 +411,81 @@ export function ResumeBuilder({
       setGeneratingId(null);
     });
   };
+
+  const refreshBillingStatus = useCallback(
+    async ({ silent = false }: { silent?: boolean } = {}) => {
+      if (!silent) {
+        setStatusMessage("");
+      }
+      setIsBillingPending(true);
+
+      try {
+        const response = await fetch("/api/billing/refresh", {
+          method: "POST",
+        });
+
+        const result = (await response.json().catch(() => null)) as
+          | {
+              ok?: boolean;
+              hasAccess?: boolean;
+              status?: string;
+              trialEndsAt?: string | null;
+              currentPeriodEnd?: string | null;
+              error?: string;
+            }
+          | null;
+
+        if (!response.ok || !result?.ok) {
+          if (!silent) {
+            setStatusMessage(
+              result?.error ?? "Could not refresh billing status right now.",
+            );
+          }
+          return false;
+        }
+
+        const nextState: BillingState = {
+          hasAccess: result.hasAccess === true,
+          status: result.status ?? "inactive",
+          trialEndsAt:
+            typeof result.trialEndsAt === "string" ? result.trialEndsAt : null,
+          currentPeriodEnd:
+            typeof result.currentPeriodEnd === "string"
+              ? result.currentPeriodEnd
+              : null,
+        };
+
+        setBillingState(nextState);
+
+        if (nextState.hasAccess) {
+          setStatusMessage("Payment confirmed. Premium access unlocked.");
+          return true;
+        }
+
+        if (!silent) {
+          setStatusMessage(
+            "Payment is still processing. Please wait a moment and refresh again.",
+          );
+        }
+        return false;
+      } finally {
+        setIsBillingPending(false);
+      }
+    },
+    [],
+  );
+
+  useEffect(() => {
+    if (billingRedirectStatus !== "success" || hasPaidAccess) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      void refreshBillingStatus({ silent: true });
+    }, 700);
+
+    return () => clearTimeout(timer);
+  }, [billingRedirectStatus, hasPaidAccess, refreshBillingStatus]);
 
   const startCheckout = async () => {
     if (!resumeReadyForCheckout) {
@@ -562,7 +662,7 @@ export function ResumeBuilder({
             {hasPaidAccess ? (
               <p className="text-sm text-zinc-700 dark:text-zinc-200">
                 Subscription status:{" "}
-                <span className="font-medium capitalize">{billing.status}</span>
+                <span className="font-medium capitalize">{billingState.status}</span>
                 {trialEndsText ? ` · Trial ends ${trialEndsText}` : ""}
                 {currentPeriodEndText ? ` · Current period ends ${currentPeriodEndText}` : ""}
               </p>
@@ -593,14 +693,26 @@ export function ResumeBuilder({
                 {isBillingPending ? "Opening..." : "Manage Billing"}
               </button>
             ) : (
-              <button
-                type="button"
-                onClick={startCheckout}
-                disabled={isBillingPending || !resumeReadyForCheckout}
-                className="rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {isBillingPending ? "Redirecting..." : "Continue to Payment"}
-              </button>
+              <>
+                <button
+                  type="button"
+                  onClick={startCheckout}
+                  disabled={isBillingPending || !resumeReadyForCheckout}
+                  className="rounded-lg bg-sky-600 px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {isBillingPending ? "Redirecting..." : "Continue to Payment"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    void refreshBillingStatus();
+                  }}
+                  disabled={isBillingPending}
+                  className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-60 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+                >
+                  {isBillingPending ? "Checking..." : "I Already Paid"}
+                </button>
+              </>
             )}
           </div>
         </div>

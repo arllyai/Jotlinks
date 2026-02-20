@@ -253,6 +253,14 @@ Optional:
    - Starts 7-day trial window
    - Continues at $9.99/month
 
+### Stripe Key Safety (Cursor + Vercel)
+
+- Never commit live keys to Git (keep them only in `.env` locally and Vercel env vars).
+- Use **secret** key only on server routes (`STRIPE_SECRET_KEY`), never in client code.
+- Keep webhook verification enabled with `STRIPE_WEBHOOK_SECRET`.
+- Rotate keys immediately if exposed.
+- In Cursor, store secrets in environment variables (not in source files or chat logs).
+
 ## Database Schema
 
 Main models:
@@ -281,6 +289,7 @@ Schema file:
 - `POST /api/generate-bullets`
 - `POST /api/billing/checkout`
 - `POST /api/billing/portal`
+- `POST /api/billing/refresh`
 - `POST /api/stripe/webhook`
 - `GET /api/integrations/status`
 

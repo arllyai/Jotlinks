@@ -9,8 +9,10 @@ import { resumeDataSchema, resumeTemplateSchema } from "@/lib/validation";
 
 export default async function ResumeBuilderPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ billing?: string }>;
 }) {
   const session = await getServerSession(authOptions);
 
@@ -57,6 +59,7 @@ export default async function ResumeBuilderPage({
   });
 
   const billingStatus = user?.stripeSubscriptionStatus ?? "inactive";
+  const resolvedSearchParams = await searchParams;
 
   return (
     <ResumeBuilder
@@ -74,6 +77,7 @@ export default async function ResumeBuilderPage({
         trialEndsAt: user?.stripeTrialEndsAt?.toISOString() ?? null,
         currentPeriodEnd: user?.stripeCurrentPeriodEnd?.toISOString() ?? null,
       }}
+      billingRedirectStatus={resolvedSearchParams.billing ?? null}
     />
   );
 }
