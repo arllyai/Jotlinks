@@ -17,6 +17,7 @@ import {
   createEmptyEducation,
   createEmptyExperience,
   createEmptyProject,
+  createStudentPresetResumeData,
 } from "@/lib/default-resume";
 import { getClientBaseUrl } from "@/lib/app-url";
 import { isResumeReadyForCheckout } from "@/lib/resume-completion";
@@ -187,35 +188,72 @@ export function ResumeBuilder({
     setSaveState("saved");
   };
 
-  const saveResume = useCallback(async () => {
-    setSaveState("saving");
-    const response = await fetch(`/api/resumes/${initialResume.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        title,
-        template,
-        isPublic,
-        data,
-      }),
-    });
+  const applyStudentPreset = () => {
+    const hasExistingContent =
+      data.personalInfo.name.trim() ||
+      data.personalInfo.email.trim() ||
+      data.summary.trim() ||
+      data.education.length > 0 ||
+      data.experience.length > 0 ||
+      data.projects.length > 0 ||
+      data.skills.length > 0 ||
+      data.activities.length > 0;
 
-    if (!response.ok) {
-      const result = (await response.json().catch(() => null)) as
-        | { error?: string }
-        | null;
-      setSaveState("error");
-      setStatusMessage(
-        result?.error ?? "Autosave failed. Keep editing and we will retry.",
-      );
+    if (
+      hasExistingContent &&
+      !window.confirm(
+        "Replace current resume fields with a student preset example?",
+      )
+    ) {
       return;
     }
 
-    setDirty(false);
-    setSaveState("saved");
-    setStatusMessage("All changes saved.");
+    setData(createStudentPresetResumeData());
+    setTitle("Student Resume");
+    setTemplate("classic");
+    if (!hasPaidAccess) {
+      setIsPublic(false);
+    }
+    markDirty();
+    setStatusMessage("Student preset loaded. Customize it to match your experience.");
+  };
+
+  const saveResume = useCallback(async () => {
+    setSaveState("saving");
+    try {
+      const response = await fetch(`/api/resumes/${initialResume.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title,
+          template,
+          isPublic,
+          data,
+        }),
+      });
+
+      if (!response.ok) {
+        const result = (await response.json().catch(() => null)) as
+          | { error?: string }
+          | null;
+        setSaveState("error");
+        setStatusMessage(
+          result?.error ?? "Autosave failed. Keep editing and we will retry.",
+        );
+        return;
+      }
+
+      setDirty(false);
+      setSaveState("saved");
+      setStatusMessage("All changes saved.");
+    } catch {
+      setSaveState("error");
+      setStatusMessage(
+        "Network error while autosaving. Keep editing and we will retry.",
+      );
+    }
   }, [data, initialResume.id, isPublic, template, title]);
 
   useEffect(() => {
@@ -374,41 +412,50 @@ export function ResumeBuilder({
     setStatusMessage("");
 
     startTransition(async () => {
-      const response = await fetch("/api/generate-bullets", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          role: payload.role,
-          organization: payload.organization,
-          description: payload.description,
-        }),
-      });
+      try {
+        const response = await fetch("/api/generate-bullets", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            role: payload.role,
+            organization: payload.organization,
+            description: payload.description,
+          }),
+        });
 
-      if (!response.ok) {
-        setStatusMessage("Could not generate bullets for this entry.");
+        if (!response.ok) {
+          const result = (await response.json().catch(() => null)) as
+            | { error?: string }
+            | null;
+          setStatusMessage(result?.error ?? "Could not generate bullets for this entry.");
+          return;
+        }
+
+        const result = (await response.json()) as {
+          bullets: string[];
+          source?: "xai" | "openai" | "fallback";
+        };
+
+        if (kind === "experience") {
+          updateExperience(payload.id, { bullets: result.bullets });
+        } else {
+          updateProject(payload.id, { bullets: result.bullets });
+        }
+
+        setStatusMessage(
+          result.source && result.source !== "fallback"
+            ? `AI bullets generated via ${result.source.toUpperCase()}.`
+            : "AI bullets generated.",
+        );
+      } catch {
+        setStatusMessage(
+          "Network error while generating bullets. Please try again.",
+        );
+      } finally {
         setGeneratingId(null);
-        return;
       }
-
-      const result = (await response.json()) as {
-        bullets: string[];
-        source?: "xai" | "openai" | "fallback";
-      };
-
-      if (kind === "experience") {
-        updateExperience(payload.id, { bullets: result.bullets });
-      } else {
-        updateProject(payload.id, { bullets: result.bullets });
-      }
-
-      setStatusMessage(
-        result.source && result.source !== "fallback"
-          ? `AI bullets generated via ${result.source.toUpperCase()}.`
-          : "AI bullets generated.",
-      );
-      setGeneratingId(null);
     });
   };
 
@@ -768,6 +815,18 @@ export function ResumeBuilder({
                   <option value="modern">Modern</option>
                 </select>
               </label>
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={applyStudentPreset}
+                className="rounded-lg border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              >
+                Load Student Preset
+              </button>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                Quickly fill example content, then edit it to your own details.
+              </p>
             </div>
           </SectionCard>
 

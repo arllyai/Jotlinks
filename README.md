@@ -43,6 +43,7 @@ It helps users:
 - AI bullet generation per experience/project entry
 - AI provider routing (`AI_PROVIDER=auto|xai|openai`)
 - Live preview with multiple templates (Classic + Modern)
+- Student preset autofill to bootstrap first draft content
 - PDF export endpoint
 - Shareable public resume links
 - Autosave every few seconds
