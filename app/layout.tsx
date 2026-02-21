@@ -36,7 +36,7 @@ export default function RootLayout({
         <Providers>
           <FirebaseAnalytics />
           <Navbar />
-          <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">{children}</main>
+          <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">{children}</main>
         </Providers>
       </body>
     </html>

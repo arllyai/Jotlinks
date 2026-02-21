@@ -53,42 +53,42 @@ export function SignupForm() {
   };
 
   return (
-    <div className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900">
-      <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+    <div className="ms-card w-full max-w-md p-6">
+      <h1 className="text-2xl font-semibold tracking-tight">
         Create your account
       </h1>
-      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+      <p className="mt-2 text-sm text-[var(--muted)]">
         Start building internship-ready resumes in minutes.
       </p>
 
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-200">
+          <span className="mb-1 block text-sm font-medium">
             Full name
           </span>
           <input
             name="name"
             required
-            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-sky-500 dark:border-zinc-700 dark:bg-zinc-950"
+            className="ms-input"
             placeholder="Taylor Student"
           />
         </label>
 
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-200">
+          <span className="mb-1 block text-sm font-medium">
             Email
           </span>
           <input
             name="email"
             type="email"
             required
-            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-sky-500 dark:border-zinc-700 dark:bg-zinc-950"
+            className="ms-input"
             placeholder="you@school.edu"
           />
         </label>
 
         <label className="block">
-          <span className="mb-1 block text-sm font-medium text-zinc-700 dark:text-zinc-200">
+          <span className="mb-1 block text-sm font-medium">
             Password
           </span>
           <input
@@ -96,7 +96,7 @@ export function SignupForm() {
             type="password"
             required
             minLength={8}
-            className="w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 text-sm outline-none transition focus:border-sky-500 dark:border-zinc-700 dark:bg-zinc-950"
+            className="ms-input"
             placeholder="At least 8 characters"
           />
         </label>
@@ -110,15 +110,15 @@ export function SignupForm() {
         <button
           type="submit"
           disabled={isPending}
-          className="w-full rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-70"
+          className="ms-btn-primary w-full px-4 py-2.5 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-70"
         >
           {isPending ? "Creating account..." : "Create account"}
         </button>
       </form>
 
-      <p className="mt-5 text-sm text-zinc-600 dark:text-zinc-300">
+      <p className="mt-5 text-sm text-[var(--muted)]">
         Already have an account?{" "}
-        <Link href="/login" className="font-medium text-sky-600 dark:text-sky-400">
+        <Link href="/login" className="font-medium text-[var(--accent)]">
           Log in
         </Link>
       </p>

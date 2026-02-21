@@ -3,28 +3,28 @@ import Link from "next/link";
 export default function Home() {
   return (
     <div className="space-y-16 pb-16">
-      <section className="relative overflow-hidden rounded-3xl border border-zinc-200 bg-gradient-to-b from-sky-50 to-white px-6 py-14 shadow-sm dark:border-zinc-800 dark:from-zinc-900 dark:to-zinc-950 sm:px-10">
+      <section className="ms-card overflow-hidden px-6 py-14 sm:px-10">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="inline-flex rounded-full bg-sky-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-sky-700 dark:bg-sky-900/40 dark:text-sky-300">
+          <span className="inline-flex rounded-md bg-[var(--accent-soft)] px-3 py-1 text-xs font-semibold uppercase tracking-wide text-[var(--accent)]">
             AI Resume Builder for Students
           </span>
-          <h1 className="mt-4 text-balance text-4xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl">
+          <h1 className="mt-4 text-balance text-4xl font-semibold tracking-tight sm:text-5xl">
             Build Your Resume in Minutes with AI
           </h1>
-          <p className="mx-auto mt-4 max-w-2xl text-pretty text-base text-zinc-600 dark:text-zinc-300 sm:text-lg">
+          <p className="mx-auto mt-4 max-w-2xl text-pretty text-base text-[var(--muted)] sm:text-lg">
             Perfect for students, internships, and first jobs. Fill simple forms,
             let AI generate accomplishment bullets, and download a polished PDF.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               href="/signup"
-              className="rounded-xl bg-sky-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-sky-500"
+              className="ms-btn-primary px-5 py-3 text-sm font-semibold"
             >
               Get Started
             </Link>
             <Link
               href="/templates"
-              className="rounded-xl border border-zinc-300 bg-white px-5 py-3 text-sm font-semibold text-zinc-700 transition hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+              className="ms-btn-secondary px-5 py-3 text-sm font-semibold"
             >
               View Templates
             </Link>
@@ -33,7 +33,7 @@ export default function Home() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h2 className="text-2xl font-semibold tracking-tight">
           How It Works
         </h2>
         <div className="mt-5 grid gap-4 md:grid-cols-3">
@@ -53,12 +53,12 @@ export default function Home() {
           ].map((item) => (
             <article
               key={item.title}
-              className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+              className="ms-card p-5"
             >
-              <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+              <h3 className="text-lg font-semibold">
                 {item.title}
               </h3>
-              <p className="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-300">
+              <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
                 {item.body}
               </p>
             </article>
@@ -67,20 +67,20 @@ export default function Home() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h2 className="text-2xl font-semibold tracking-tight">
           Student-Friendly Templates
         </h2>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-300">
+        <p className="mt-2 text-sm text-[var(--muted)]">
           Clean, minimal, and professional designs that help your experience stand out.
         </p>
         <div className="mt-5 grid gap-4 md:grid-cols-3">
           {["Classic", "Modern", "Minimal"].map((template) => (
             <div
               key={template}
-              className="rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900"
+              className="ms-card p-5"
             >
-              <div className="h-36 rounded-xl border border-dashed border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800" />
-              <p className="mt-3 text-sm font-medium text-zinc-800 dark:text-zinc-200">
+              <div className="h-36 rounded-md border border-dashed border-[var(--border)] bg-[var(--surface-muted)]" />
+              <p className="mt-3 text-sm font-medium">
                 {template}
               </p>
             </div>
@@ -89,7 +89,7 @@ export default function Home() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+        <h2 className="text-2xl font-semibold tracking-tight">
           Key Features
         </h2>
         <div className="mt-5 grid gap-4 md:grid-cols-2">
@@ -103,7 +103,7 @@ export default function Home() {
           ].map((feature) => (
             <div
               key={feature}
-              className="rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-700 shadow-sm dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-200"
+              className="ms-card px-4 py-3 text-sm"
             >
               {feature}
             </div>

@@ -59,10 +59,10 @@ export function ResumeDocument({
   return (
     <article
       className={clsx(
-        "mx-auto w-full max-w-3xl rounded-2xl border bg-white p-8 shadow-sm dark:bg-zinc-900",
+        "mx-auto w-full max-w-3xl rounded-md border bg-white p-8 shadow-sm",
         template === "modern"
-          ? "border-sky-100 dark:border-sky-900/50"
-          : "border-zinc-200 dark:border-zinc-700",
+          ? "border-sky-200"
+          : "border-zinc-300",
       )}
     >
       <header className="space-y-2">
@@ -70,13 +70,13 @@ export function ResumeDocument({
           className={clsx(
             "text-3xl font-bold",
             template === "modern"
-              ? "text-sky-800 dark:text-sky-300"
-              : "text-zinc-900 dark:text-zinc-50",
+              ? "text-sky-800"
+              : "text-zinc-900",
           )}
         >
           {data.personalInfo.name || "Your Name"}
         </h1>
-        <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-zinc-600 dark:text-zinc-300">
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-sm text-zinc-600">
           {data.personalInfo.email && <span>{data.personalInfo.email}</span>}
           {data.personalInfo.phone && <span>{data.personalInfo.phone}</span>}
           {data.personalInfo.location && <span>{data.personalInfo.location}</span>}
