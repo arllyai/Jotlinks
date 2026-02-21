@@ -11,6 +11,19 @@ import { resumeDataSchema } from "@/lib/validation";
 
 export const runtime = "nodejs";
 
+const EXPECTED_MONTHLY_CENTS = 999;
+const EXPECTED_TRIAL_CENTS = 199;
+const EXPECTED_TRIAL_DAYS = 7;
+const EXPECTED_CURRENCY = "usd";
+
+const ACTIVE_BILLING_STATUSES = new Set([
+  "active",
+  "trialing",
+  "past_due",
+  "unpaid",
+  "incomplete",
+]);
+
 function sanitizeResumeId(value: unknown) {
   return typeof value === "string" ? value.trim().slice(0, 64) : "";
 }
@@ -59,12 +72,24 @@ export async function POST(request: Request) {
   if (
     !monthlyPrice.active ||
     !monthlyPrice.recurring ||
-    monthlyPrice.recurring.interval !== "month"
+    monthlyPrice.recurring.interval !== "month" ||
+    monthlyPrice.recurring.interval_count !== 1 ||
+    monthlyPrice.currency !== EXPECTED_CURRENCY ||
+    monthlyPrice.unit_amount !== EXPECTED_MONTHLY_CENTS
   ) {
     return NextResponse.json(
       {
         error:
-          "Stripe monthly price configuration is invalid. Expected an active monthly recurring price.",
+          "Stripe monthly price configuration is invalid. Expected active USD $9.99 monthly recurring price.",
+      },
+      { status: 500 },
+    );
+  }
+
+  if (pricing.trialDays !== EXPECTED_TRIAL_DAYS) {
+    return NextResponse.json(
+      {
+        error: "Stripe trial configuration must use a 7-day trial.",
       },
       { status: 500 },
     );
@@ -72,15 +97,31 @@ export async function POST(request: Request) {
 
   if (pricing.trialFeePriceId) {
     const trialPrice = await stripe.prices.retrieve(pricing.trialFeePriceId);
-    if (!trialPrice.active || Boolean(trialPrice.recurring)) {
+    if (
+      !trialPrice.active ||
+      Boolean(trialPrice.recurring) ||
+      trialPrice.currency !== EXPECTED_CURRENCY ||
+      trialPrice.unit_amount !== EXPECTED_TRIAL_CENTS
+    ) {
       return NextResponse.json(
         {
           error:
-            "Stripe trial fee price configuration is invalid. Expected an active one-time price.",
+            "Stripe trial fee price configuration is invalid. Expected active USD $1.99 one-time price.",
         },
         { status: 500 },
       );
     }
+  } else if (
+    pricing.currency !== EXPECTED_CURRENCY ||
+    pricing.trialFeeCents !== EXPECTED_TRIAL_CENTS
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          "Fallback trial fee configuration is invalid. Expected USD 199 cents ($1.99).",
+      },
+      { status: 500 },
+    );
   }
 
   let body: unknown;
@@ -168,6 +209,24 @@ export async function POST(request: Request) {
       data: {
         stripeCustomerId: customerId,
       },
+    });
+  }
+
+  const existingSubscriptions = await stripe.subscriptions.list({
+    customer: customerId,
+    status: "all",
+    limit: 20,
+  });
+
+  const existingOpenSubscription = existingSubscriptions.data.find((subscription) =>
+    ACTIVE_BILLING_STATUSES.has(subscription.status),
+  );
+
+  if (existingOpenSubscription) {
+    return NextResponse.json({
+      ok: true,
+      alreadyActive: true,
+      redirectUrl: `${getServerBaseUrl()}/dashboard/resumes/${resumeId}?billing=success`,
     });
   }
 
