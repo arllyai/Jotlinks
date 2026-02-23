@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #f3f2f1;
+  --foreground: #323130;
+  --surface: #ffffff;
+  --surface-muted: #faf9f8;
+  --border: #edebe9;
+  --muted: #605e5c;
+  --accent: #0f6cbd;
+  --accent-hover: #115ea3;
+  --accent-soft: #deecf9;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+.dark {
+  --background: #201f1e;
+  --foreground: #f3f2f1;
+  --surface: #292827;
+  --surface-muted: #323130;
+  --border: #3b3a39;
+  --muted: #c8c6c4;
+  --accent: #4f9ef8;
+  --accent-hover: #62abf5;
+  --accent-soft: #0f253d;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family:
+    "Segoe UI",
+    "Segoe UI Variable Text",
+    var(--font-geist-sans),
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+}
+
+* {
+  border-color: var(--border);
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.ms-card {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.08);
+}
+
+.ms-card-soft {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface-muted);
+}
+
+.ms-btn-primary {
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  transition: background-color 0.15s ease;
+}
+
+.ms-btn-primary:hover {
+  background: var(--accent-hover);
+}
+
+.ms-btn-secondary {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--foreground);
+  transition: background-color 0.15s ease;
+}
+
+.ms-btn-secondary:hover {
+  background: var(--surface-muted);
+}
+
+.ms-input {
+  width: 100%;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  outline: none;
+}
+
+.ms-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
