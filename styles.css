@@ -31,18 +31,18 @@ body {
 }
 
 .container {
-  width: min(1000px, 92vw);
+  width: min(1040px, 92vw);
   margin-inline: auto;
 }
 
 .hero {
-  padding: 5rem 0 3rem;
+  padding: 4.5rem 0 3rem;
 }
 
 .hero__content {
   display: grid;
   gap: 2rem;
-  grid-template-columns: 1.6fr 1fr;
+  grid-template-columns: 1.7fr 1fr;
 }
 
 .eyebrow {
@@ -70,7 +70,7 @@ h2 {
 }
 
 .summary {
-  max-width: 55ch;
+  max-width: 65ch;
 }
 
 .hero__actions {
@@ -131,10 +131,15 @@ h2 {
   margin: 0;
 }
 
+.quick-facts select {
+  width: 100%;
+  margin-top: 0.4rem;
+}
+
 .timeline-item {
   display: grid;
   gap: 0.5rem 1.5rem;
-  grid-template-columns: minmax(220px, 0.9fr) 1.5fr;
+  grid-template-columns: minmax(240px, 0.85fr) 1.6fr;
   padding: 1rem 0;
   border-bottom: 1px solid var(--border);
 }
@@ -159,18 +164,19 @@ h2 {
 
 .cards {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
 }
 
 .contact-form {
   display: grid;
   gap: 1rem;
-  max-width: 640px;
+  max-width: 760px;
 }
 
 input,
-textarea {
+textarea,
+select {
   width: 100%;
   margin-top: 0.35rem;
   border-radius: 0.65rem;
@@ -202,10 +208,9 @@ a {
   color: var(--primary);
 }
 
-@media (max-width: 820px) {
+@media (max-width: 860px) {
   .hero__content,
-  .timeline-item,
-  .cards {
+  .timeline-item {
     grid-template-columns: 1fr;
   }
 }

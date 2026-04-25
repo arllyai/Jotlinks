@@ -3,10 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Alex Morgan | Resume</title>
+    <title>Resume Builder Template</title>
     <meta
       name="description"
-      content="A modern, responsive resume website for Alex Morgan, full-stack developer."
+      content="Data-driven resume template with tailoring and proof-focused sections."
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
@@ -14,26 +14,20 @@
     <header class="hero" id="top">
       <div class="container hero__content">
         <div>
-          <p class="eyebrow">Open to opportunities</p>
-          <h1>Alex Morgan</h1>
-          <p class="subtitle">Full-Stack Developer</p>
-          <p class="summary">
-            Building reliable web experiences with JavaScript, TypeScript, Node.js,
-            and cloud-native tools.
-          </p>
+          <p class="eyebrow">7-second recruiter scan optimized</p>
+          <h1 id="candidateName"></h1>
+          <p class="subtitle" id="candidateTitle"></p>
+          <p class="summary" id="candidateSummary"></p>
           <div class="hero__actions">
-            <a class="btn btn--primary" href="#contact">Contact Me</a>
-            <a class="btn btn--ghost" href="#projects">View Projects</a>
+            <a class="btn btn--primary" href="#tailor">Tailor for Role</a>
+            <a class="btn btn--ghost" href="#proof">See Proof</a>
           </div>
         </div>
         <aside class="card quick-facts">
-          <h2>Quick Facts</h2>
-          <ul>
-            <li><strong>Location:</strong> Austin, TX</li>
-            <li><strong>Experience:</strong> 6+ years</li>
-            <li><strong>Email:</strong> alex@example.com</li>
-            <li><strong>Phone:</strong> +1 (555) 123-4567</li>
-          </ul>
+          <h2>Resume Template Data</h2>
+          <ul id="quickFacts"></ul>
+          <label for="summaryRole">Target role</label>
+          <select id="summaryRole"></select>
           <button id="themeToggle" class="btn btn--small" aria-label="Toggle color theme">
             Toggle Theme
           </button>
@@ -42,101 +36,50 @@
     </header>
 
     <main>
+      <section class="section section--alt" id="strategy">
+        <div class="container">
+          <h2>How this template gets interviews</h2>
+          <div id="strategyGrid" class="cards"></div>
+        </div>
+      </section>
+
       <section class="section" id="experience">
         <div class="container">
-          <h2>Experience</h2>
-          <article class="timeline-item">
-            <div>
-              <h3>Senior Software Engineer · BrightStack</h3>
-              <p class="meta">2022 — Present</p>
-            </div>
-            <ul>
-              <li>Led migration to micro-frontend architecture, improving release velocity by 35%.</li>
-              <li>Built internal design system used across 5 product teams.</li>
-              <li>Mentored junior engineers and led weekly architecture reviews.</li>
-            </ul>
-          </article>
-          <article class="timeline-item">
-            <div>
-              <h3>Software Engineer · Northshore Labs</h3>
-              <p class="meta">2019 — 2022</p>
-            </div>
-            <ul>
-              <li>Developed analytics dashboards with React and D3 used by enterprise clients.</li>
-              <li>Implemented CI/CD pipelines reducing deployment failures by 40%.</li>
-              <li>Collaborated with product and UX to deliver accessibility-compliant UI.</li>
-            </ul>
-          </article>
+          <h2>Experience with measurable impact</h2>
+          <div id="experienceList"></div>
         </div>
       </section>
 
       <section class="section section--alt" id="skills">
         <div class="container">
-          <h2>Skills</h2>
-          <div class="chip-grid" aria-label="Skills list">
-            <span class="chip">JavaScript</span>
-            <span class="chip">TypeScript</span>
-            <span class="chip">React</span>
-            <span class="chip">Node.js</span>
-            <span class="chip">Express</span>
-            <span class="chip">PostgreSQL</span>
-            <span class="chip">Docker</span>
-            <span class="chip">AWS</span>
-            <span class="chip">CI/CD</span>
-            <span class="chip">Testing</span>
-          </div>
+          <h2>Relevant skills & tools</h2>
+          <div class="chip-grid" id="skillsList" aria-label="Skills list"></div>
         </div>
       </section>
 
-      <section class="section" id="projects">
+      <section class="section" id="proof">
         <div class="container">
-          <h2>Projects</h2>
-          <div class="cards">
-            <article class="card project">
-              <h3>TaskFlow</h3>
-              <p>Kanban productivity app with real-time collaboration and offline sync.</p>
-              <p class="meta">React · Firebase · Tailwind</p>
-            </article>
-            <article class="card project">
-              <h3>InsightBoard</h3>
-              <p>Data visualization platform for sales teams with custom report builder.</p>
-              <p class="meta">TypeScript · Node.js · PostgreSQL</p>
-            </article>
-            <article class="card project">
-              <h3>API Monitor</h3>
-              <p>Monitoring utility that tracks API latency and uptime with alerting.</p>
-              <p class="meta">Go · Prometheus · Grafana</p>
-            </article>
-          </div>
+          <h2>Proof of work</h2>
+          <div id="proofLinks" class="cards"></div>
         </div>
       </section>
 
-      <section class="section section--alt" id="education">
+      <section class="section section--alt" id="tailor">
         <div class="container">
-          <h2>Education</h2>
-          <p><strong>B.S. in Computer Science</strong> — University of Texas at Dallas (2015 — 2019)</p>
-        </div>
-      </section>
-
-      <section class="section" id="contact">
-        <div class="container">
-          <h2>Contact</h2>
-          <form class="contact-form" id="contactForm" novalidate>
+          <h2>Tailor for each role</h2>
+          <p class="meta">Paste a job description to match keywords and refine your resume focus.</p>
+          <form class="contact-form" id="tailorForm" novalidate>
             <label>
-              Name
-              <input type="text" name="name" required minlength="2" />
+              Job description
+              <textarea id="jobDescription" rows="7" required minlength="30"></textarea>
             </label>
-            <label>
-              Email
-              <input type="email" name="email" required />
-            </label>
-            <label>
-              Message
-              <textarea name="message" rows="5" required minlength="10"></textarea>
-            </label>
-            <button class="btn btn--primary" type="submit">Send Message</button>
-            <p id="formStatus" class="form-status" role="status" aria-live="polite"></p>
+            <button class="btn btn--primary" type="submit">Match Keywords</button>
+            <p id="tailorStatus" class="form-status" role="status" aria-live="polite"></p>
           </form>
+          <div>
+            <h3>Matched keywords</h3>
+            <div id="matchedKeywords" class="chip-grid"></div>
+          </div>
         </div>
       </section>
     </main>
@@ -144,7 +87,7 @@
     <footer class="footer">
       <div class="container footer__content">
         <a href="#top">Back to top ↑</a>
-        <p>© <span id="year"></span> Alex Morgan</p>
+        <p>© <span id="year"></span> Resume Template Builder</p>
       </div>
     </footer>
 

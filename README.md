@@ -1,13 +1,15 @@
-# Resume Website App
+# Resume Website App (Data-Driven Template)
 
-A simple, responsive one-page resume website built with vanilla HTML, CSS, and JavaScript.
+This app now includes a **resume template data feature** so you can adapt your resume quickly for each role.
 
-## Features
+## What changed
 
-- Modern responsive layout
-- Experience, skills, project, education, and contact sections
-- Light/dark theme toggle with `localStorage` persistence
-- Contact form with basic validation and feedback message
+- Resume content is generated from a central JavaScript data model (`resumeTemplateData`)
+- Built-in strategy cards based on 7-second recruiter scan principles
+- Experience bullets emphasize measurable outcomes and metrics
+- Proof links section for portfolio/GitHub/LinkedIn
+- Tailoring form that matches job-description keywords to your listed skills
+- Role selector that swaps your professional summary for role alignment
 
 ## Run locally
 
